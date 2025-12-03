@@ -1,0 +1,34 @@
+{
+  "name": "base-cms",
+  "version": "1.0.0",
+  "description": "My mathematical Nuxt.js project",
+  "author": "khuong09072004",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@iconify/vue2": "^2.1.0",
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/composition-api": "^0.34.0",
+    "@nuxtjs/dotenv": "^1.4.0",
+    "ant-design-vue": "^1.1.10",
+    "axios": "^1.13.2",
+    "js-cookie": "^3.0.5",
+    "nuxt": "^2.0.0",
+    "socket.io-client": "^4.8.1",
+    "vue-google-login": "^2.0.5",
+    "vue-google-oauth2": "^1.5.10"
+  },
+  "devDependencies": {
+    "@iconify/json": "^2.2.410",
+    "autoprefixer": "10",
+    "postcss": "8",
+    "tailwindcss": "1.9.6",
+    "unplugin-icons": "^22.5.0",
+    "unplugin-vue2-script-setup": "^0.11.4"
+  }
+}
