@@ -1,12 +1,12 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-8">
     <h3 class="text-lg font-semibold text-gray-700 mb-6">
-      Fill in the blank based on the pattern
+      Điền vào chỗ trống dựa theo mẫu
     </h3>
 
     <!-- Pattern Hint -->
     <div class="mb-6 text-center p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border-2 border-orange-200">
-      <p class="text-sm text-orange-600 mb-2 font-semibold">Word Pattern:</p>
+      <p class="text-sm text-orange-600 mb-2 font-semibold">Mẫu từ:</p>
       <p class="text-4xl font-mono font-bold text-orange-800 tracking-widest">
         {{ question.question.pattern }}
       </p>
@@ -14,7 +14,7 @@
 
     <!-- Sentence Context -->
     <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-      <p class="text-sm text-gray-500 mb-2 font-semibold">Sentence:</p>
+      <p class="text-sm text-gray-500 mb-2 font-semibold">Câu:</p>
       <p class="text-lg text-gray-800 leading-relaxed">
         "{{ question.question.sentence }}"
       </p>
@@ -23,7 +23,7 @@
     <!-- Input Field -->
     <div class="mb-6">
       <label class="block text-sm font-semibold text-gray-700 mb-3">
-        Your Answer:
+        Câu trả lời của bạn:
       </label>
       <input
         v-model="inputAnswer"
@@ -43,10 +43,10 @@
       <!-- Pattern Match Feedback -->
       <div v-if="inputAnswer" class="mt-3 text-center">
         <p v-if="matchesPattern" class="text-sm text-green-600 font-semibold">
-          ✓ Matches the pattern!
+          ✓ Phù hợp với mẫu!
         </p>
         <p v-else class="text-sm text-red-600 font-semibold">
-          ✗ Does not match the pattern "{{ question.question.pattern }}"
+          ✗ Không khớp với mẫu "{{ question.question.pattern }}"
         </p>
       </div>
     </div>
@@ -63,13 +63,13 @@
     <div class="space-y-3">
       <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p class="text-sm text-blue-800">
-          <strong>💡 Tip:</strong> The pattern shows the first letter and the number of underscores indicates the remaining letters.
+          <strong>💡 Mẹo:</strong> Mẫu này hiển thị chữ cái đầu tiên và số lượng dấu gạch dưới biểu thị các chữ cái còn lại.
         </p>
       </div>
       
       <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p class="text-sm text-yellow-800">
-          <strong>📝 Example:</strong> Pattern "c____" with 5 letters could be "close", "chair", "clean", etc.
+          <strong>📝 Ví dụ:</strong> Mẫu "c____" với 5 chữ cái có thể là "close", "chair", "clean", v.v.
         </p>
       </div>
     </div>

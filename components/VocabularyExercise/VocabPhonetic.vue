@@ -1,12 +1,12 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-8">
     <h3 class="text-lg font-semibold text-gray-700 mb-6">
-      Write the word based on its phonetic transcription
+      Viết từ dựa trên phiên âm của nó
     </h3>
 
     <!-- Phonetic Display -->
     <div class="mb-8 text-center p-10 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border-2 border-green-200">
-      <p class="text-sm text-green-600 mb-2 font-semibold">Phonetic Transcription:</p>
+      <p class="text-sm text-green-600 mb-2 font-semibold">Phiên âm:</p>
       <p class="text-5xl font-mono text-green-800">
         {{ question.question.phonetic }}
       </p>
@@ -15,7 +15,7 @@
     <!-- Input Field -->
     <div class="mb-6">
       <label class="block text-sm font-semibold text-gray-700 mb-3">
-        Your Answer:
+        Câu trả lời của bạn:
       </label>
       <input
         v-model="inputAnswer"
@@ -41,14 +41,14 @@
     <!-- Instruction -->
     <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
       <p class="text-sm text-yellow-800">
-        <strong>💡 Tip:</strong> Listen carefully to the phonetic symbols and type the English word.
+        <strong>💡 Mẹo:</strong> Hãy nhìn kỹ các ký hiệu ngữ âm và nhập từ tiếng Anh.
       </p>
     </div>
 
     <!-- Example Help -->
     <div class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
       <p class="text-xs text-gray-600">
-        <strong>Example:</strong> /ˈkæt/ → "cat" | /dɔg/ → "dog"
+        <strong>Ví dụ:</strong> /ˈkæt/ → "cat" | /dɔg/ → "dog"
       </p>
     </div>
   </div>

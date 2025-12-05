@@ -128,22 +128,60 @@
                             <div
                               v-for="exercise in exercises"
                               :key="exercise.id"
-                              class="p-3 bg-white border border-gray-200 rounded-lg hover:bg-yellow-50 hover:border-yellow-400 hover:shadow-sm transition-all duration-300 cursor-pointer group"
-                              @click="selectExercise(exercise)"
+                              class="p-3 bg-white border rounded-lg transition-all duration-300 cursor-pointer group relative"
+                              :class="[
+                                exercise.isDone 
+                                  ? 'border-green-300 bg-green-50 hover:bg-green-100 hover:border-green-400' 
+                                  : 'border-gray-200 hover:bg-yellow-50 hover:border-yellow-400',
+                                'hover:shadow-sm'
+                              ]"
+                              @click.stop="showConfirmDialog(exercise)"
                             >
-                              <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-2 flex-1">
-                                  <span>📝</span>
-                                  <p class="font-medium text-gray-800 group-hover:text-yellow-700">
+                              
+                              <div class="flex justify-between items-center gap-3">
+                                <!-- Title và icon -->
+                                <div class="flex items-center gap-2 flex-1 min-w-0">
+                                  <span class="text-lg flex-shrink-0">
+                                    {{ exercise.isDone ? '✅' : '📝' }}
+                                  </span>
+                                  <p 
+                                    class="font-medium truncate"
+                                    :class="exercise.isDone ? 'text-green-800' : 'text-gray-800 group-hover:text-yellow-700'"
+                                  >
                                     {{ exercise.title }}
                                   </p>
                                 </div>
-                                <div class="flex items-center gap-2 text-sm text-gray-600">
-                                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                  <span>{{ exercise.duration }} minutes</span>
+
+                                <!-- Info: Duration và Score -->
+                                <div class="flex items-center gap-3 text-sm flex-shrink-0">
+                                  <!-- Duration -->
+                                  <div class="flex items-center gap-1 text-gray-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>{{ exercise.duration }}m</span>
+                                  </div>
+
+                                  <!-- Score -->
+                                  <div 
+                                    class="flex items-center gap-1 font-semibold px-2 py-1 rounded"
+                                    :class="getScoreClass(exercise.score, exercise.isDone)"
+                                  >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                    <span>{{ exercise.isDone ? exercise.score : '--' }}/100</span>
+                                  </div>
                                 </div>
+                              </div>
+
+                              <!-- Progress bar (nếu đã hoàn thành) -->
+                              <div v-if="exercise.isDone" class="mt-2 bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                                <div 
+                                  class="h-full rounded-full transition-all duration-500"
+                                  :class="getScoreBarClass(exercise.score)"
+                                  :style="{ width: exercise.score + '%' }"
+                                ></div>
                               </div>
                             </div>
                           </div>
@@ -200,6 +238,104 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <transition name="dialog-fade">
+      <div 
+        v-if="showDialog" 
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+        @click="closeDialog"
+      >
+        <div 
+          class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all"
+          :class="showDialog ? 'scale-100 opacity-100' : 'scale-95 opacity-0'"
+          @click.stop
+        >
+          <!-- Dialog Header -->
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-bold text-gray-900">Xác nhận học bài</h3>
+                <p class="text-sm text-gray-500 mt-0.5">Bạn sẵn sàng bắt đầu chưa?</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dialog Body -->
+          <div v-if="selectedExercise" class="p-6 space-y-4">
+            <!-- Exercise Title -->
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Tên bài học:</p>
+              <p class="text-lg font-semibold text-gray-900">{{ selectedExercise.title }}</p>
+            </div>
+
+            <!-- Exercise Info -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Duration -->
+              <div class="bg-blue-50 rounded-lg p-3">
+                <div class="flex items-center gap-2 text-blue-600 mb-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-xs font-medium">Thời gian</span>
+                </div>
+                <p class="text-lg font-bold text-blue-700">{{ selectedExercise.duration }} phút</p>
+              </div>
+
+              <!-- Score Status -->
+              <div 
+                class="rounded-lg p-3"
+                :class="selectedExercise.isDone ? 'bg-green-50' : 'bg-gray-50'"
+              >
+                <div class="flex items-center gap-2 mb-1" :class="selectedExercise.isDone ? 'text-green-600' : 'text-gray-600'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-xs font-medium">Trạng thái</span>
+                </div>
+                <p class="text-lg font-bold" :class="selectedExercise.isDone ? 'text-green-700' : 'text-gray-700'">
+                  {{ selectedExercise.isDone ? `${selectedExercise.score} điểm` : 'Chưa làm' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Note for completed exercises -->
+            <div v-if="selectedExercise.isDone" class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-yellow-800">Bài này đã hoàn thành</p>
+                  <p class="text-xs text-yellow-700 mt-0.5">Bạn có thể làm lại để cải thiện điểm số</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dialog Footer -->
+          <div class="p-6 bg-gray-50 rounded-b-2xl flex gap-3">
+            <button
+              class="flex-1 px-4 py-2.5 p-2 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+              @click.stop="closeDialog"
+            >
+              Hủy
+            </button>
+            <button
+              class="flex-1 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
+              @click.stop="confirmExercise"
+            >
+              {{ selectedExercise && selectedExercise.isDone ? 'Làm lại' : 'Bắt đầu' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -236,7 +372,11 @@ export default {
       lastFailedAction: null,
       
       // Race condition prevention
-      currentRequestId: null
+      currentRequestId: null,
+
+      // Dialog state
+      showDialog: false,
+      selectedExercise: null
     };
   },
 
@@ -405,12 +545,89 @@ export default {
       return topic ? topic.name : "";
     },
 
-    // Xử lý khi click vào exercise
-    selectExercise(exercise) {
-      console.log("📝 Selected exercise:", exercise);
-      // Navigate đến trang làm bài
-      this.$router.push(`/exercise/${exercise.id}`);
+    // Xác định class màu cho điểm số
+    getScoreClass(score, isDone) {
+      if (!isDone) {
+        return 'text-gray-400 bg-gray-100';
+      }
+      
+      if (score >= 80) {
+        return 'text-green-700 bg-green-100';
+      } else if (score >= 60) {
+        return 'text-blue-700 bg-blue-100';
+      } else if (score >= 40) {
+        return 'text-orange-700 bg-orange-100';
+      } else {
+        return 'text-red-700 bg-red-100';
+      }
+    },
+
+    // Xác định class màu cho progress bar
+    getScoreBarClass(score) {
+      if (score >= 80) {
+        return 'bg-green-500';
+      } else if (score >= 60) {
+        return 'bg-blue-500';
+      } else if (score >= 40) {
+        return 'bg-orange-500';
+      } else {
+        return 'bg-red-500';
+      }
+    },
+
+    // Show confirmation dialog
+    showConfirmDialog(exercise) {
+      console.log("🔍 Opening dialog for exercise:", exercise);
+      this.selectedExercise = exercise;
+      
+      // Use nextTick to ensure DOM is ready
+      this.$nextTick(() => {
+        this.showDialog = true;
+        // Prevent body scroll when dialog is open
+        document.body.style.overflow = 'hidden';
+        console.log("✅ Dialog opened, showDialog:", this.showDialog);
+      });
+    },
+
+    // Close dialog
+    closeDialog() {
+      console.log("❌ Closing dialog");
+      this.showDialog = false;
+      
+      // Use nextTick to reset after transition
+      this.$nextTick(() => {
+        this.selectedExercise = null;
+        // Restore body scroll
+        document.body.style.overflow = '';
+      });
+    },
+
+    // Confirm and navigate to exercise
+    confirmExercise() {
+      if (!this.selectedExercise) {
+        console.error("❌ No exercise selected!");
+        return;
+      }
+
+      console.log("📝 Starting exercise:", this.selectedExercise);
+      console.log("Score:", this.selectedExercise.score, "| Done:", this.selectedExercise.isDone);
+      
+      // Store exercise info before navigation
+      const exerciseId = this.selectedExercise.id;
+      
+      // Close dialog first
+      this.closeDialog();
+      
+      // Navigate after dialog closes
+      this.$nextTick(() => {
+        this.$router.push(`/exercise/${exerciseId}`);
+      });
     }
+  },
+
+  // Cleanup when component is destroyed
+  beforeDestroy() {
+    document.body.style.overflow = '';
   }
 };
 </script>
@@ -431,6 +648,22 @@ export default {
   opacity: 0;
 }
 
+/* Dialog fade animation */
+.dialog-fade-enter-active,
+.dialog-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.dialog-fade-enter,
+.dialog-fade-leave-to {
+  opacity: 0;
+}
+
+.dialog-fade-enter .bg-white,
+.dialog-fade-leave-to .bg-white {
+  transform: scale(0.95);
+}
+
 /* Rotate animation */
 .rotate-180 {
   transform: rotate(180deg);
@@ -449,8 +682,3 @@ export default {
   background: #888;
   border-radius: 4px;
 }
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-</style>
