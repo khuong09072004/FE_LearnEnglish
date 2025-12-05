@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-8">
     <h3 class="text-lg font-semibold text-gray-700 mb-6">
-      Choose the correct meaning of the word
+      Chọn nghĩa đúng của từ
     </h3>
 
     <!-- Word Display -->
@@ -43,7 +43,7 @@
     <!-- Instruction -->
     <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
       <p class="text-sm text-blue-800">
-        <strong>💡 Tip:</strong> Select the option that best represents the Vietnamese meaning of the word.
+        <strong>💡 Mẹo:</strong> Chọn phương án thể hiện đúng nghĩa tiếng Việt nhất của từ.
       </p>
     </div>
   </div>

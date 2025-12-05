@@ -1,12 +1,20 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8 px-4">
+    <button
+      class="mb-4 flex items-center gap-1 px-4 py-2 text-gray-600 rounded-lg transition-colors"
+      @click="goBack"
+    >
+      <a-icon type="left" />
+      <span class="font-semibold"> Quay lại</span>
+    </button>
+
     <div class="max-w-4xl mx-auto">
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-20">
         <div
           class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto"
         ></div>
-        <p class="mt-4 text-gray-600">Loading exercise...</p>
+        <p class="mt-4 text-gray-600">Đang tải bài tập...</p>
       </div>
 
       <!-- Error State -->
@@ -28,14 +36,14 @@
           />
         </svg>
         <h3 class="text-xl font-semibold text-red-800 mb-2">
-          Failed to load exercise
+          Không tải được bài tập
         </h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
         <button
           class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
           @click="loadExercise"
         >
-          Retry
+          Thử lại
         </button>
       </div>
 
@@ -103,7 +111,7 @@
             class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold"
             @click="previousQuestion"
           >
-            ← Previous
+            Trước
           </button>
           <div v-else></div>
 
@@ -118,7 +126,7 @@
             "
             @click="nextQuestion"
           >
-            Next →
+            Tiếp Tục
           </button>
           <button
             v-else
@@ -129,7 +137,7 @@
             "
             @click="submitExercise"
           >
-            Submit
+            Nộp Bài
           </button>
         </div>
 
@@ -158,11 +166,17 @@
 </template>
 
 <script>
+import { Howl } from "howler";
 import { getExercisesItems, submitVocabExercise } from "../../apis/exercise";
 import VocabMatch from "../../components/VocabularyExercise/VocabMatch.vue";
 import VocabMeaningChoice from "../../components/VocabularyExercise/VocabMeaningChoice.vue";
 import VocabPhonetic from "../../components/VocabularyExercise/VocabPhonetic.vue";
 import VocabPatternFill from "../../components/VocabularyExercise/VocabPatternFill.vue";
+import GrammarMCQ from "../../components/GrammarExercise/GrammarMCQ.vue";
+import GrammarSentenceChoice from "../../components/GrammarExercise/GrammarSentenceChoice.vue";
+import GrammarFindError from "../../components/GrammarExercise/GrammarFindError.vue";
+import GrammarReorder from "../../components/GrammarExercise/GrammarReorder.vue";
+import GrammarRewrite from "../../components/GrammarExercise/GrammarRewrite.vue";
 
 export default {
   layout: "pageLayout",
@@ -173,6 +187,11 @@ export default {
     VocabMeaningChoice,
     VocabPhonetic,
     VocabPatternFill,
+    GrammarMCQ,
+    GrammarSentenceChoice,
+    GrammarFindError,
+    GrammarReorder,
+    GrammarRewrite,
   },
 
   data() {
@@ -181,23 +200,38 @@ export default {
       loading: true,
       error: null,
       currentQuestionIndex: 0,
-      userAnswers: {}, // { questionId: answer }
-      timeLeft: 0, // seconds
+      userAnswers: {},
+      timeLeft: 0,
       timerInterval: null,
+      isSubmitting: false,
+
+      // Sound effects
+      sounds: {
+        answer: null,
+        correct: null,
+        wrong: null,
+        click: null,
+        submit: null,
+        timeWarning: null,
+        complete: null,
+      },
     };
   },
 
   computed: {
     exerciseComponent() {
       if (!this.exerciseData) return null;
-
       const typeMap = {
         VOCAB_MATCH: "VocabMatch",
         VOCAB_MEANING_CHOICE: "VocabMeaningChoice",
         VOCAB_PHONETIC: "VocabPhonetic",
         VOCAB_PATTERN_FILL: "VocabPatternFill",
+        GRAMMAR_MCQ: "GrammarMCQ",
+        GRAMMAR_SENTENCE_CHOICE: "GrammarSentenceChoice",
+        GRAMMAR_FIND_ERROR: "GrammarFindError",
+        GRAMMAR_REORDER: "GrammarReorder",
+        GRAMMAR_REWRITE: "GrammarRewrite",
       };
-
       return typeMap[this.exerciseData.type] || null;
     },
 
@@ -226,16 +260,83 @@ export default {
   },
 
   mounted() {
+    this.initSounds();
     this.loadExercise();
   },
 
   beforeDestroy() {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-    }
+    this.clearTimer();
+    this.destroySounds();
   },
 
   methods: {
+    // ✅ Initialize sound effects
+    initSounds() {
+      // Bạn cần thêm các file âm thanh vào /static/sounds/
+      // Hoặc dùng URL từ CDN
+
+      this.sounds.answer = new Howl({
+        src: ["/sounds/pop.mp3"], // Âm thanh khi chọn đáp án
+        volume: 0.5,
+      });
+
+      this.sounds.click = new Howl({
+        src: ["/sounds/click.mp3"], // Âm thanh click button
+        volume: 0.3,
+      });
+
+      this.sounds.submit = new Howl({
+        src: ["/sounds/success.mp3"], // Âm thanh nộp bài
+        volume: 0.6,
+      });
+
+      this.sounds.timeWarning = new Howl({
+        src: ["/sounds/countdown.mp3"], // Âm thanh cảnh báo hết giờ
+        volume: 0.4,
+      });
+
+      this.sounds.complete = new Howl({
+        src: ["/sounds/success.mp3"], // Âm thanh hoàn thành
+        volume: 0.7,
+      });
+    },
+
+    // ✅ Play sound helper
+    playSound(soundName) {
+      if (this.sounds[soundName]) {
+        this.sounds[soundName].play();
+      }
+    },
+
+    // ✅ Destroy sounds on component destroy
+    destroySounds() {
+      Object.values(this.sounds).forEach((sound) => {
+        if (sound) sound.unload();
+      });
+    },
+
+    goBack() {
+      const hasAnswers = Object.keys(this.userAnswers).length > 0;
+
+      if (hasAnswers) {
+        const confirmed = confirm(
+          "Bạn có chắc muốn thoát? Tiến trình làm bài sẽ bị mất."
+        );
+        if (!confirmed) return;
+      }
+
+      this.playSound("click");
+      this.clearTimer();
+      this.$router.back();
+    },
+
+    clearTimer() {
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
+    },
+
     async loadExercise() {
       this.loading = true;
       this.error = null;
@@ -245,7 +346,7 @@ export default {
         const response = await getExercisesItems(exerciseId);
 
         this.exerciseData = response.data;
-        this.timeLeft = this.exerciseData.duration * 60; // Convert minutes to seconds
+        this.timeLeft = this.exerciseData.duration * 60;
 
         this.startTimer();
 
@@ -260,9 +361,21 @@ export default {
     },
 
     startTimer() {
+      this.clearTimer();
+
       this.timerInterval = setInterval(() => {
         if (this.timeLeft > 0) {
           this.timeLeft--;
+
+          // ⏰ Play warning sound when 1 minute left
+          if (this.timeLeft === 10) {
+            this.playSound("timeWarning");
+          }
+
+          // ⏰ Play tick sound when < 10 seconds
+          if (this.timeLeft <= 10 && this.timeLeft > 0) {
+            this.playSound("click");
+          }
         } else {
           this.timeExpired();
         }
@@ -270,13 +383,18 @@ export default {
     },
 
     timeExpired() {
-      clearInterval(this.timerInterval);
-      this.$toast.warning("Time is up!");
+      this.clearTimer();
+      this.playSound("timeWarning");
+      this.$toast.warning("Hết giờ làm bài!");
       this.submitExercise();
     },
 
     handleAnswer(answer) {
       this.$set(this.userAnswers, this.currentQuestion.id, answer);
+
+      // 🔊 Play sound when answer is selected
+      this.playSound("answer");
+
       console.log("📝 Answer recorded:", {
         questionId: this.currentQuestion.id,
         answer,
@@ -285,29 +403,40 @@ export default {
 
     nextQuestion() {
       if (this.currentQuestionIndex < this.totalQuestions - 1) {
+        this.playSound("click");
         this.currentQuestionIndex++;
       }
     },
 
     previousQuestion() {
       if (this.currentQuestionIndex > 0) {
+        this.playSound("click");
         this.currentQuestionIndex--;
       }
     },
 
     goToQuestion(index) {
+      this.playSound("click");
       this.currentQuestionIndex = index;
     },
 
     async submitExercise() {
+      if (this.isSubmitting) {
+        console.log("⏳ Already submitting...");
+        return;
+      }
+
       if (!this.allQuestionsAnswered) {
-        const confirmed = confirm(
-          "You have not answered all questions. Submit anyway?"
-        );
+        const confirmed = confirm("Bạn chưa trả lời hết câu hỏi. Vẫn nộp bài?");
         if (!confirmed) return;
       }
 
-      clearInterval(this.timerInterval);
+      this.isSubmitting = true;
+      this.clearTimer();
+
+      // 🔊 Play submit sound
+      this.playSound("submit");
+      console.log("🔊 TRY PLAY SUBMIT");
 
       try {
         const answers = this.exerciseData.ExerciesItem.map((item) => ({
@@ -319,28 +448,41 @@ export default {
 
         console.log("📤 Submitting exercise:", { exerciseId, answers });
 
-        // Call API submit
         const response = await submitVocabExercise(exerciseId, answers);
 
         console.log("✅ Submit response:", response);
 
-        // ✅ Lấy data từ response
-        const resultData = response.data;
+        const resultData = response?.data?.data || response?.data || response;
 
-        this.$toast.success("Exercise submitted successfully!");
-        
-        // ✅ Navigate với đúng cấu trúc
+        console.log("📊 Result data:", resultData);
+
+        // 🔊 Play complete sound
+        this.playSound("complete");
+        console.log("🔊 TRY PLAY COMPLETE");
+
         this.$router.push({
-          path: `/exercise/resul/${resultData.resultId}`,
+          path: `/exercise/result/${resultData.resultId}`,
           query: {
             data: JSON.stringify(resultData),
           },
         });
+
+        this.$toast.success("Nộp bài thành công!");
       } catch (error) {
         console.error("❌ Error submitting exercise:", error);
-        this.$toast.error(
-          error.response?.data?.message || "Failed to submit exercise"
-        );
+
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Có lỗi xảy ra khi nộp bài";
+
+        this.$toast.error(errorMessage);
+
+        this.isSubmitting = false;
+
+        if (this.timeLeft > 0) {
+          this.startTimer();
+        }
       }
     },
   },
@@ -348,7 +490,6 @@ export default {
 </script>
 
 <style scoped>
-/* Custom animations */
 @keyframes pulse {
   0%,
   100% {

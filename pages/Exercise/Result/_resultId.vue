@@ -41,15 +41,15 @@
           <div class="grid grid-cols-3 gap-4 mt-8">
             <div class="p-4 bg-green-50 rounded-lg border-2 border-green-200">
               <p class="text-3xl font-bold text-green-600">{{ resultData.correctCount }}</p>
-              <p class="text-sm text-gray-600 mt-1">Correct</p>
+              <p class="text-sm text-gray-600 mt-1">Chính xác</p>
             </div>
             <div class="p-4 bg-red-50 rounded-lg border-2 border-red-200">
               <p class="text-3xl font-bold text-red-600">{{ incorrectCount }}</p>
-              <p class="text-sm text-gray-600 mt-1">Incorrect</p>
+              <p class="text-sm text-gray-600 mt-1">Sai</p>
             </div>
             <div class="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
               <p class="text-3xl font-bold text-blue-600">{{ totalQuestions }}</p>
-              <p class="text-sm text-gray-600 mt-1">Total</p>
+              <p class="text-sm text-gray-600 mt-1">Tổng</p>
             </div>
           </div>
 
@@ -67,7 +67,7 @@
             <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            Answer Review
+            Đáp Án
           </h2>
 
           <div class="space-y-4">
@@ -121,7 +121,7 @@
 
                   <!-- Your Answer -->
                   <div class="mb-2">
-                    <p class="text-sm text-gray-600 mb-1">Your answer:</p>
+                    <p class="text-sm text-gray-600 mb-1">Câu trả lời của bạn::</p>
                     <p
                       class="font-medium text-lg"
                       :class="answer.isCorrect ? 'text-green-700' : 'text-red-700'"
@@ -132,7 +132,7 @@
 
                   <!-- Correct Answer (nếu sai) -->
                   <div v-if="!answer.isCorrect" class="mt-3 p-3 bg-white rounded border-2 border-green-300">
-                    <p class="text-sm text-gray-600 mb-1">Correct answer:</p>
+                    <p class="text-sm text-gray-600 mb-1">Câu trả lời đúng:</p>
                     <p class="font-medium text-lg text-green-700">
                       {{ answer['answer-correct'] }}
                     </p>
@@ -149,13 +149,13 @@
             class="flex-1 px-6 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl"
             @click="goToExerciseList"
           >
-            ← Back to Exercises
+            Quay lại bài tập
           </button>
           <button
             class="flex-1 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl"
             @click="retryExercise"
           >
-            Try Again 🔄
+            Thử Lại 
           </button>
         </div>
       </div>
@@ -196,12 +196,12 @@ export default {
 
     scoreMessage() {
       const score = this.resultData?.score || 0;
-      if (score >= 90) return '🎉 Excellent!';
-      if (score >= 80) return '👏 Great Job!';
-      if (score >= 70) return '👍 Good Work!';
-      if (score >= 60) return '🙂 Not Bad!';
-      if (score >= 50) return '😐 Keep Trying!';
-      return '💪 Practice More!';
+      if (score >= 90) return '🎉 Xuất sắc!';
+      if (score >= 80) return '👏 Làm tốt lắm!';
+      if (score >= 70) return '👍 Làm tốt!';
+      if (score >= 60) return '🙂 Không tệ!';
+      if (score >= 50) return '😐 Tiếp tục cố gắng!';
+      return '💪 Luyện tập thêm!';
     },
 
     formattedCompletionTime() {

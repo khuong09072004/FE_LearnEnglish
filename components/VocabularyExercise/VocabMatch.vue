@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-8">
     <h3 class="text-lg font-semibold text-gray-700 mb-6">
-      Match the phonetic transcription with the correct word
+      Ghép phiên âm với từ đúng
     </h3>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -48,7 +48,7 @@
     <!-- Instruction -->
     <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
       <p class="text-sm text-yellow-800">
-        <strong>💡 Tip:</strong> Listen to the sound and choose the word that matches the phonetic transcription.
+        <strong>💡 Mẹo:</strong>  Chọn từ phù hợp với phiên âm.
       </p>
     </div>
   </div>
