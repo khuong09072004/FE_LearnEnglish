@@ -3,19 +3,19 @@
     <!-- Question Header -->
     <div class="mb-6">
       <div class="flex items-center justify-between mb-4">
-        <span class="text-sm font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+        <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
           Câu {{ questionNumber }} / {{ totalQuestions }}
         </span>
         <span class="text-sm text-gray-500">Rewrite Sentence</span>
       </div>
       
-      <h3 class="text-xl font-bold text-gray-800 mb-2">
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">
         Viết lại câu cho đúng ngữ pháp
       </h3>
     </div>
 
     <!-- Instruction -->
-    <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-4 mb-6 border-l-4 border-orange-500">
+    <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-4 mb-6 border-l-4 border-blue-500">
       <p class="text-sm text-gray-700">
         <span class="font-semibold">💡 {{ question.question.instruction }}</span>
       </p>
@@ -25,13 +25,13 @@
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-600 mb-2">Câu gốc (có lỗi):</p>
       <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4">
-        <div class="flex items-start gap-3">
-          <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <p class="text-lg text-red-800 font-medium leading-relaxed">
+          <p class="text-lg  text-red-800 font-medium leading-relaxed">
             {{ question.question.original }}
           </p>
         </div>
@@ -64,8 +64,8 @@
 
     <!-- Preview Answer -->
     <div v-if="rewrittenSentence.trim()" class="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-4">
-      <div class="flex items-start gap-3">
-        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+      <div class="flex items-center gap-3">
+        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>

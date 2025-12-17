@@ -121,7 +121,7 @@
 
                   <!-- Your Answer -->
                   <div class="mb-2">
-                    <p class="text-sm text-gray-600 mb-1">Câu trả lời của bạn::</p>
+                    <p class="text-sm text-gray-600 mb-1">Câu trả lời của bạn:</p>
                     <p
                       class="font-medium text-lg"
                       :class="answer.isCorrect ? 'text-green-700' : 'text-red-700'"
@@ -134,7 +134,7 @@
                   <div v-if="!answer.isCorrect" class="mt-3 p-3 bg-white rounded border-2 border-green-300">
                     <p class="text-sm text-gray-600 mb-1">Câu trả lời đúng:</p>
                     <p class="font-medium text-lg text-green-700">
-                      {{ answer['answer-correct'] }}
+                      {{ formatCorrectAnswer(answer['answer-correct']) }}
                     </p>
                   </div>
                 </div>
@@ -222,6 +222,15 @@ export default {
   },
 
   methods: {
+    formatCorrectAnswer(answer) {
+      // Nếu là array, lấy phần tử đầu tiên
+      if (Array.isArray(answer)) {
+        return answer[0] || '';
+      }
+      // Nếu là string, trả về trực tiếp
+      return answer || '';
+    },
+
     loadResultFromQuery() {
       try {
         // Lấy data từ query params

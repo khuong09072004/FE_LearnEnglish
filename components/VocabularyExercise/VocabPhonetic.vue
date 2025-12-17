@@ -5,9 +5,9 @@
     </h3>
 
     <!-- Phonetic Display -->
-    <div class="mb-8 text-center p-10 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border-2 border-green-200">
-      <p class="text-sm text-green-600 mb-2 font-semibold">Phiên âm:</p>
-      <p class="text-5xl font-mono text-green-800">
+    <div class="mb-8 text-center p-10 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border-2 border-blue-200">
+      <p class="text-sm text-blue-600 mb-2 font-semibold">Phiên âm:</p>
+      <p class="text-5xl font-mono text-blue-800">
         {{ question.question.phonetic }}
       </p>
     </div>
@@ -24,7 +24,7 @@
         class="w-full px-6 py-4 text-2xl text-center border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
         :class="[
           inputAnswer
-            ? 'border-green-400 bg-green-50'
+            ? 'border-blue-400 bg-green-50'
             : 'border-gray-300 bg-white'
         ]"
         @input="handleInput"

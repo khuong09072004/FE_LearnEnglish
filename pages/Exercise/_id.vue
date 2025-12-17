@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 py-8 px-4">
     <button
       class="mb-4 flex items-center gap-1 px-4 py-2 text-gray-600 rounded-lg transition-colors"
-      @click="goBack"
+      @click="showExitConfirm"
     >
       <a-icon type="left" />
       <span class="font-semibold"> Quay lại</span>
@@ -101,6 +101,8 @@
           :question-number="currentQuestionIndex + 1"
           :total-questions="totalQuestions"
           :user-answer="userAnswers[currentQuestion.id]"
+          :audio-url="exerciseData.audioUrl"
+          :passage="passage"
           @answer="handleAnswer"
         />
 
@@ -162,12 +164,69 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirm Modal -->
+    <div
+      v-if="showConfirmModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      @click.self="closeConfirmModal"
+    >
+      <div
+        class="bg-white rounded-lg shadow-2xl max-w-sm w-full transform transition-all"
+      >
+        <!-- Icon -->
+        <div class="flex justify-center pt-6">
+          <div
+            class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center"
+          >
+            <svg
+              class="w-8 h-8 text-yellow-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4v2m0 5v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 text-center">
+          <h3 class="text-xl font-bold text-gray-800 mb-2">
+            Bạn có chắc muốn thoát?
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Tiến trình làm bài sẽ bị mất. Bạn vẫn muốn tiếp tục?
+          </p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-3 px-6 pb-6">
+          <button
+            class="flex-1 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+            @click="closeConfirmModal"
+          >
+            Ở lại
+          </button>
+          <button
+            class="flex-1 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors"
+            @click="confirmExit"
+          >
+            Thoát
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { Howl } from "howler";
-import { getExercisesItems, submitVocabExercise } from "../../apis/exercise";
+import { getExercisesItems, getPassageById } from "../../apis/exercise";
 import VocabMatch from "../../components/VocabularyExercise/VocabMatch.vue";
 import VocabMeaningChoice from "../../components/VocabularyExercise/VocabMeaningChoice.vue";
 import VocabPhonetic from "../../components/VocabularyExercise/VocabPhonetic.vue";
@@ -177,6 +236,20 @@ import GrammarSentenceChoice from "../../components/GrammarExercise/GrammarSente
 import GrammarFindError from "../../components/GrammarExercise/GrammarFindError.vue";
 import GrammarReorder from "../../components/GrammarExercise/GrammarReorder.vue";
 import GrammarRewrite from "../../components/GrammarExercise/GrammarRewrite.vue";
+import ListeningFill from "../../components/ListeningExercise/ListeningFill.vue";
+import ListeningQA from "../../components/ListeningExercise/ListeningQA.vue";
+import ListeningWrite from "../../components/ListeningExercise/ListeningWrite.vue";
+import ReadFill from "../../components/ReadingExercise/ReadFill.vue";
+import ReadQA from "../../components/ReadingExercise/ReadQA.vue";
+import ReadMCQ from "../../components/ReadingExercise/ReadMCQ.vue";
+import WriteReorder from "../../components/WritingExercise/WriteReorder.vue";
+import WriteRewrite from "../../components/WritingExercise/WriteRewrite.vue";
+import WriteFix from "../../components/WritingExercise/WriteFix.vue";
+import WriteReorderGroup from "../../components/WritingExercise/WriteReorderGroup.vue";
+
+import exerciseSoundMixin from "../../mixins/exerciseSoundMixin";
+import exerciseTimerMixin from "../../mixins/exerciseTimerMixin";
+import exerciseSubmitMixin from "../../mixins/exerciseSubmitMixin";
 
 export default {
   layout: "pageLayout",
@@ -192,29 +265,29 @@ export default {
     GrammarFindError,
     GrammarReorder,
     GrammarRewrite,
+    ListeningFill,
+    ListeningQA,
+    ListeningWrite,
+    ReadFill,
+    ReadQA,
+    ReadMCQ,
+    WriteReorder,
+    WriteRewrite,
+    WriteFix,
+    WriteReorderGroup,
   },
+
+  mixins: [exerciseSoundMixin, exerciseTimerMixin, exerciseSubmitMixin],
 
   data() {
     return {
       exerciseData: null,
+      passage: null,
       loading: true,
       error: null,
       currentQuestionIndex: 0,
       userAnswers: {},
-      timeLeft: 0,
-      timerInterval: null,
-      isSubmitting: false,
-
-      // Sound effects
-      sounds: {
-        answer: null,
-        correct: null,
-        wrong: null,
-        click: null,
-        submit: null,
-        timeWarning: null,
-        complete: null,
-      },
+      showConfirmModal: false,
     };
   },
 
@@ -231,6 +304,16 @@ export default {
         GRAMMAR_FIND_ERROR: "GrammarFindError",
         GRAMMAR_REORDER: "GrammarReorder",
         GRAMMAR_REWRITE: "GrammarRewrite",
+        LISTEN_FILL: "ListeningFill",
+        LISTEN_QA: "ListeningQA",
+        LISTEN_WRITE: "ListeningWrite",
+        READ_FILL: "ReadFill",
+        READ_QA: "ReadQA",
+        READ_MCQ: "ReadMCQ",
+        WRITE_REORDER: "WriteReorder",
+        WRITE_REWRITE: "WriteRewrite",
+        WRITE_FIX: "WriteFix",
+        WRITE_REORDER_GROUP: "WriteReorderGroup",
       };
       return typeMap[this.exerciseData.type] || null;
     },
@@ -246,12 +329,6 @@ export default {
     progressPercent() {
       const answered = Object.keys(this.userAnswers).length;
       return (answered / this.totalQuestions) * 100;
-    },
-
-    formattedTime() {
-      const minutes = Math.floor(this.timeLeft / 60);
-      const seconds = this.timeLeft % 60;
-      return `${minutes}:${seconds.toString().padStart(2, "0")}`;
     },
 
     allQuestionsAnswered() {
@@ -270,73 +347,6 @@ export default {
   },
 
   methods: {
-    // ✅ Initialize sound effects
-    initSounds() {
-      // Bạn cần thêm các file âm thanh vào /static/sounds/
-      // Hoặc dùng URL từ CDN
-
-      this.sounds.answer = new Howl({
-        src: ["/sounds/pop.mp3"], // Âm thanh khi chọn đáp án
-        volume: 0.5,
-      });
-
-      this.sounds.click = new Howl({
-        src: ["/sounds/click.mp3"], // Âm thanh click button
-        volume: 0.3,
-      });
-
-      this.sounds.submit = new Howl({
-        src: ["/sounds/success.mp3"], // Âm thanh nộp bài
-        volume: 0.6,
-      });
-
-      this.sounds.timeWarning = new Howl({
-        src: ["/sounds/countdown.mp3"], // Âm thanh cảnh báo hết giờ
-        volume: 0.4,
-      });
-
-      this.sounds.complete = new Howl({
-        src: ["/sounds/success.mp3"], // Âm thanh hoàn thành
-        volume: 0.7,
-      });
-    },
-
-    // ✅ Play sound helper
-    playSound(soundName) {
-      if (this.sounds[soundName]) {
-        this.sounds[soundName].play();
-      }
-    },
-
-    // ✅ Destroy sounds on component destroy
-    destroySounds() {
-      Object.values(this.sounds).forEach((sound) => {
-        if (sound) sound.unload();
-      });
-    },
-
-    goBack() {
-      const hasAnswers = Object.keys(this.userAnswers).length > 0;
-
-      if (hasAnswers) {
-        const confirmed = confirm(
-          "Bạn có chắc muốn thoát? Tiến trình làm bài sẽ bị mất."
-        );
-        if (!confirmed) return;
-      }
-
-      this.playSound("click");
-      this.clearTimer();
-      this.$router.back();
-    },
-
-    clearTimer() {
-      if (this.timerInterval) {
-        clearInterval(this.timerInterval);
-        this.timerInterval = null;
-      }
-    },
-
     async loadExercise() {
       this.loading = true;
       this.error = null;
@@ -346,11 +356,15 @@ export default {
         const response = await getExercisesItems(exerciseId);
 
         this.exerciseData = response.data;
-        this.timeLeft = this.exerciseData.duration * 60;
 
-        this.startTimer();
+        if (this.exerciseData.passageId) {
+          await this.loadPassage(this.exerciseData.passageId);
+        }
+
+        this.startTimer(this.exerciseData.duration);
 
         console.log("✅ Exercise loaded:", this.exerciseData);
+        console.log("✅ Passage loaded:", this.passage);
       } catch (error) {
         console.error("❌ Error loading exercise:", error);
         this.error = error.response?.data?.message || "Something went wrong";
@@ -360,39 +374,20 @@ export default {
       }
     },
 
-    startTimer() {
-      this.clearTimer();
+    async loadPassage(passageId) {
+      try {
+        console.log("📚 Loading passage ID:", passageId);
+        const response = await getPassageById(passageId);
+        this.passage = response.data || response;
 
-      this.timerInterval = setInterval(() => {
-        if (this.timeLeft > 0) {
-          this.timeLeft--;
-
-          // ⏰ Play warning sound when 1 minute left
-          if (this.timeLeft === 10) {
-            this.playSound("timeWarning");
-          }
-
-          // ⏰ Play tick sound when < 10 seconds
-          if (this.timeLeft <= 10 && this.timeLeft > 0) {
-            this.playSound("click");
-          }
-        } else {
-          this.timeExpired();
-        }
-      }, 1000);
-    },
-
-    timeExpired() {
-      this.clearTimer();
-      this.playSound("timeWarning");
-      this.$toast.warning("Hết giờ làm bài!");
-      this.submitExercise();
+        console.log("✅ Passage loaded:", this.passage);
+      } catch (error) {
+        console.error("❌ Error loading passage:", error);
+      }
     },
 
     handleAnswer(answer) {
       this.$set(this.userAnswers, this.currentQuestion.id, answer);
-
-      // 🔊 Play sound when answer is selected
       this.playSound("answer");
 
       console.log("📝 Answer recorded:", {
@@ -420,70 +415,29 @@ export default {
       this.currentQuestionIndex = index;
     },
 
-    async submitExercise() {
-      if (this.isSubmitting) {
-        console.log("⏳ Already submitting...");
-        return;
-      }
+    showExitConfirm() {
+      const hasAnswers = Object.keys(this.userAnswers).length > 0;
 
-      if (!this.allQuestionsAnswered) {
-        const confirmed = confirm("Bạn chưa trả lời hết câu hỏi. Vẫn nộp bài?");
-        if (!confirmed) return;
+      if (hasAnswers) {
+        this.showConfirmModal = true;
+      } else {
+        this.goBackNow();
       }
+    },
 
-      this.isSubmitting = true;
+    closeConfirmModal() {
+      this.showConfirmModal = false;
+    },
+
+    confirmExit() {
+      this.closeConfirmModal();
+      this.goBackNow();
+    },
+
+    goBackNow() {
+      this.playSound("click");
       this.clearTimer();
-
-      // 🔊 Play submit sound
-      this.playSound("submit");
-      console.log("🔊 TRY PLAY SUBMIT");
-
-      try {
-        const answers = this.exerciseData.ExerciesItem.map((item) => ({
-          id: item.id,
-          answer: this.userAnswers[item.id] || "",
-        }));
-
-        const exerciseId = parseInt(this.$route.params.id);
-
-        console.log("📤 Submitting exercise:", { exerciseId, answers });
-
-        const response = await submitVocabExercise(exerciseId, answers);
-
-        console.log("✅ Submit response:", response);
-
-        const resultData = response?.data?.data || response?.data || response;
-
-        console.log("📊 Result data:", resultData);
-
-        // 🔊 Play complete sound
-        this.playSound("complete");
-        console.log("🔊 TRY PLAY COMPLETE");
-
-        this.$router.push({
-          path: `/exercise/result/${resultData.resultId}`,
-          query: {
-            data: JSON.stringify(resultData),
-          },
-        });
-
-        this.$toast.success("Nộp bài thành công!");
-      } catch (error) {
-        console.error("❌ Error submitting exercise:", error);
-
-        const errorMessage =
-          error.response?.data?.message ||
-          error.message ||
-          "Có lỗi xảy ra khi nộp bài";
-
-        this.$toast.error(errorMessage);
-
-        this.isSubmitting = false;
-
-        if (this.timeLeft > 0) {
-          this.startTimer();
-        }
-      }
+      this.$router.back();
     },
   },
 };

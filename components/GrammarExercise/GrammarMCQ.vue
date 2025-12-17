@@ -9,14 +9,14 @@
         <span class="text-sm text-gray-500">Multiple Choice</span>
       </div>
       
-      <h3 class="text-xl font-bold text-gray-800 mb-2">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">
         Chọn đáp án đúng để hoàn thành câu
       </h3>
     </div>
 
     <!-- Question Text -->
-    <div class="bg-gray-50 rounded-lg p-6 mb-6">
-      <p class="text-lg text-gray-800 leading-relaxed">
+    <div class="bg-gray-50 rounded-lg p-2 mb-6">
+      <p class="text-lg text-blue-800 leading-relaxed">
         {{ question.question.question }}
       </p>
     </div>
@@ -29,8 +29,8 @@
         class="w-full text-left p-4 rounded-lg border-2 transition-all duration-200 font-medium"
         :class="[
           selectedAnswer === option
-            ? 'border-blue-500 bg-blue-50 text-blue-700'
-            : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 text-gray-700'
+            ? 'bg-blue-500 text-white border-blue-600 shadow-lg scale-105'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:bg-blue-50'
         ]"
         @click="selectOption(option)"
       >
