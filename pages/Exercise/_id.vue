@@ -100,7 +100,9 @@
           :question="currentQuestion"
           :question-number="currentQuestionIndex + 1"
           :total-questions="totalQuestions"
-          :user-answer="userAnswers[currentQuestion.id]"
+          :user-answer="
+            currentQuestion ? userAnswers[currentQuestion.id] : null
+          "
           :audio-url="exerciseData.audioUrl"
           :passage="passage"
           @answer="handleAnswer"
@@ -132,11 +134,7 @@
           </button>
           <button
             v-else
-            class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold"
-            :disabled="!allQuestionsAnswered"
-            :class="
-              !allQuestionsAnswered ? 'opacity-50 cursor-not-allowed' : ''
-            "
+            class="px-6 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors"
             @click="submitExercise"
           >
             Nộp Bài
@@ -327,12 +325,20 @@ export default {
     },
 
     progressPercent() {
-      const answered = Object.keys(this.userAnswers).length;
-      return (answered / this.totalQuestions) * 100;
+      if (!this.exerciseData) return 0;
+      const answered = this.exerciseData.ExerciesItem.filter(
+        (q) =>
+          this.userAnswers[q.id] !== undefined && this.userAnswers[q.id] !== ""
+      ).length;
+      return Math.round((answered / this.totalQuestions) * 100);
     },
 
     allQuestionsAnswered() {
-      return Object.keys(this.userAnswers).length === this.totalQuestions;
+      if (!this.exerciseData) return false;
+      return this.exerciseData.ExerciesItem.every(
+        (q) =>
+          this.userAnswers[q.id] !== undefined && this.userAnswers[q.id] !== ""
+      );
     },
   },
 
@@ -361,10 +367,9 @@ export default {
           await this.loadPassage(this.exerciseData.passageId);
         }
 
-        this.startTimer(this.exerciseData.duration);
+        this.startTimer(0.2);
 
-        console.log("✅ Exercise loaded:", this.exerciseData);
-        console.log("✅ Passage loaded:", this.passage);
+        
       } catch (error) {
         console.error("❌ Error loading exercise:", error);
         this.error = error.response?.data?.message || "Something went wrong";
@@ -376,11 +381,11 @@ export default {
 
     async loadPassage(passageId) {
       try {
-        console.log("📚 Loading passage ID:", passageId);
+      
         const response = await getPassageById(passageId);
         this.passage = response.data || response;
 
-        console.log("✅ Passage loaded:", this.passage);
+        
       } catch (error) {
         console.error("❌ Error loading passage:", error);
       }
@@ -390,16 +395,14 @@ export default {
       this.$set(this.userAnswers, this.currentQuestion.id, answer);
       this.playSound("answer");
 
-      console.log("📝 Answer recorded:", {
-        questionId: this.currentQuestion.id,
-        answer,
-      });
+     
     },
 
     nextQuestion() {
       if (this.currentQuestionIndex < this.totalQuestions - 1) {
         this.playSound("click");
         this.currentQuestionIndex++;
+        
       }
     },
 

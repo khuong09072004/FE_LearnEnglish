@@ -86,10 +86,7 @@ export default {
     if (this.userAnswer) {
       this.userInput = this.userAnswer;
     }
-    console.log("✅ WriteRewrite mounted", {
-      question: this.question,
-      userAnswer: this.userAnswer,
-    });
+   
   },
 
   watch: {

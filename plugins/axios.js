@@ -6,17 +6,12 @@ import { Modal } from "ant-design-vue";
 export default (_, inject) => {
   // Thiết lập baseURL
   axios.defaults.baseURL = process.env.NUXT_ENV_BASE_URL;
-  console.log("BaseURL:", axios.defaults.baseURL);
   axios.defaults.headers["Content-Type"] = "application/json";
 
   // --- Gắn token vào header trước mỗi request ---
   axios.interceptors.request.use((config) => {
     const token = Cookies.get("token");
-    console.log("Request URL:", config.url);
-    console.log(
-      "Authorization header:",
-      token ? `Bearer ${token}` : "Chưa có token"
-    );
+   
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

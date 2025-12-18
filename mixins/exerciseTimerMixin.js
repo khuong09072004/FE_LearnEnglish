@@ -3,6 +3,7 @@ export default {
     return {
       timeLeft: 0,
       timerInterval: null,
+      isTimeUp: false,
     };
   },
 
@@ -16,19 +17,16 @@ export default {
 
   methods: {
     startTimer(duration) {
-      this.timeLeft = duration * 60;
       this.clearTimer();
+      this.timeLeft = duration * 60;
+      this.isTimeUp = false;
 
       this.timerInterval = setInterval(() => {
         if (this.timeLeft > 0) {
           this.timeLeft--;
 
-          if (this.timeLeft === 10) {
-            this.playSound("timeWarning");
-          }
-
-          if (this.timeLeft <= 10 && this.timeLeft > 0) {
-            this.playSound("click");
+          if (this.timeLeft === 10 && !this.isTimeUp) {
+            this.playSound && this.playSound("timeWarning");
           }
         } else {
           this.timeExpired();
@@ -44,10 +42,36 @@ export default {
     },
 
     timeExpired() {
+      
+      
+      if (this.isTimeUp) return;
+      this.isTimeUp = true;
+
       this.clearTimer();
-      this.playSound("timeWarning");
-      this.$toast.warning("Hết giờ làm bài!");
-      this.submitExercise();
+      
+      if (this.playSound) {
+        this.playSound("timeWarning");
+      }
+
+      // Auto fill empty answers
+      if (this.exerciseData && this.exerciseData.ExerciesItem) {
+        this.exerciseData.ExerciesItem.forEach((item) => {
+          if (!this.userAnswers[item.id]) {
+            this.$set(this.userAnswers, item.id, "");
+          }
+        });
+      }
+
+      
+      
+      // ✅ Gọi submitExercise
+      this.$nextTick(() => {
+        if (typeof this.submitExercise === 'function') {
+          this.submitExercise(true);
+        } else {
+          console.error('❌ submitExercise not found!');
+        }
+      });
     },
   },
 };

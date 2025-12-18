@@ -59,10 +59,10 @@ export default {
   },
   async mounted() {
     this.loading = true;
-    console.log("Mounted chạy rồi");
+  
     try {
       const res = await getListTopic();
-      console.log("List of topics =", res.data);
+     
       this.topics = res.data || [];
     } catch (err) {
       console.error("API fail:", err.response?.status, err.response?.data);

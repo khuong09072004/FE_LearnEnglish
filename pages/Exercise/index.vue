@@ -399,7 +399,7 @@ export default {
       try {
         const response = await getListTopic();
         this.topics = response.data || [];
-        console.log("✅ Loaded Topics:", this.topics);
+        
       } catch (error) {
         console.error("❌ Error loading topics:", error);
         this.errorMessage = "Failed to load topics. Please try again.";
@@ -430,7 +430,7 @@ export default {
       // Kiểm tra cache trước
       if (this.categoriesCache[topicId]) {
         this.categories = this.categoriesCache[topicId];
-        console.log("📦 Categories loaded from cache");
+        
         return;
       }
 
@@ -445,13 +445,13 @@ export default {
         
         // Chỉ update nếu vẫn là request mới nhất
         if (this.currentRequestId !== requestId) {
-          console.log("⚠️ Request outdated, ignoring");
+          
           return;
         }
         
         this.categories = response.data || [];
         this.categoriesCache[topicId] = this.categories; // Cache lại
-        console.log("✅ Loaded Categories:", this.categories);
+       
       } catch (error) {
         if (this.currentRequestId !== requestId) return;
         
@@ -486,7 +486,7 @@ export default {
       // Kiểm tra cache
       if (this.exercisesCache[cacheKey]) {
         this.exercises = this.exercisesCache[cacheKey];
-        console.log("📦 Exercises loaded from cache");
+        
         return;
       }
 
@@ -501,13 +501,13 @@ export default {
         const response = await getExercisesByCategory(this.activeTopic, category);
         
         if (this.currentRequestId !== requestId) {
-          console.log("⚠️ Request outdated, ignoring");
+          
           return;
         }
         
         this.exercises = response.data || [];
         this.exercisesCache[cacheKey] = this.exercises; // Cache lại
-        console.log("✅ Loaded Exercises:", this.exercises);
+       
       } catch (error) {
         if (this.currentRequestId !== requestId) return;
         
@@ -583,7 +583,7 @@ export default {
 
     // Show confirmation dialog
     showConfirmDialog(exercise) {
-      console.log("🔍 Opening dialog for exercise:", exercise);
+      
       this.selectedExercise = exercise;
       
       // Use nextTick to ensure DOM is ready
@@ -591,13 +591,13 @@ export default {
         this.showDialog = true;
         // Prevent body scroll when dialog is open
         document.body.style.overflow = 'hidden';
-        console.log("✅ Dialog opened, showDialog:", this.showDialog);
+       
       });
     },
 
     // Close dialog
     closeDialog() {
-      console.log("❌ Closing dialog");
+    
       this.showDialog = false;
       
       // Use nextTick to reset after transition
@@ -615,8 +615,7 @@ export default {
         return;
       }
 
-      console.log("📝 Starting exercise:", this.selectedExercise);
-      console.log("Score:", this.selectedExercise.score, "| Done:", this.selectedExercise.isDone);
+      
       
       // Store exercise info before navigation
       const exerciseId = this.selectedExercise.id;

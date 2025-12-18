@@ -89,10 +89,7 @@ export default {
     if (this.userAnswer) {
       this.userInput = this.userAnswer;
     }
-    console.log("✅ WriteFix mounted", {
-      question: this.question,
-      userAnswer: this.userAnswer,
-    });
+    
   },
 
   watch: {

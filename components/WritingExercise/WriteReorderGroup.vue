@@ -129,11 +129,7 @@ export default {
     if (this.userAnswer) {
       this.parseUserAnswer(this.userAnswer);
     }
-    console.log("✅ WriteReorderGroup mounted", {
-      question: this.question,
-      availableGroups: this.availableGroups,
-      userAnswer: this.userAnswer,
-    });
+    
   },
 
   watch: {

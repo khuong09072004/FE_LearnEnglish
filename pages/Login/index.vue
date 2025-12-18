@@ -166,7 +166,7 @@ export default {
 
     async handleGoogleResponse(response) {
       const id_token = response.credential;
-      console.log("Google ID Token:", id_token);
+     
 
       try {
         const data = await loginWithGoogle({ id_token });

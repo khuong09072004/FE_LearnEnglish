@@ -126,7 +126,7 @@
                       class="font-medium text-lg"
                       :class="answer.isCorrect ? 'text-green-700' : 'text-red-700'"
                     >
-                      {{ answer['answer-you'] || '(No answer)' }}
+                      {{ answer['answer-you'] || '(chưa làm)' }}
                     </p>
                   </div>
 
@@ -238,7 +238,7 @@ export default {
         
         if (dataString) {
           this.resultData = JSON.parse(dataString);
-          console.log('✅ Result data loaded:', this.resultData);
+         
         } else {
           this.error = 'No result data found';
           this.$toast.error('Result data not found');
