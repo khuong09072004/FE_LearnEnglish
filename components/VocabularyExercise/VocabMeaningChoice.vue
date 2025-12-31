@@ -5,8 +5,8 @@
     </h3>
 
     <!-- Word Display -->
-    <div class="mb-8 text-center p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-purple-200">
-      <p class="text-4xl font-bold text-purple-800">
+    <div class="mb-8 text-center p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-blue-200">
+      <p class="text-4xl font-bold text-blue-800">
         {{ question.question.word }}
       </p>
     </div>
@@ -19,8 +19,8 @@
         class="w-full p-5 text-left rounded-lg border-2 transition-all duration-200 font-medium"
         :class="[
           selectedAnswer === option
-            ? 'bg-purple-500 text-white border-purple-600 shadow-lg scale-105'
-            : 'bg-white text-gray-700 border-gray-300 hover:border-purple-400 hover:bg-purple-50'
+            ? 'bg-blue-500 text-white border-blue-600 shadow-lg scale-105'
+            : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:bg-purple-50'
         ]"
         @click="selectAnswer(option)"
       >
@@ -29,7 +29,7 @@
             class="w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 font-bold"
             :class="[
               selectedAnswer === option
-                ? 'border-white bg-white text-purple-500'
+                ? 'border-white bg-white text-blue-500'
                 : 'border-gray-400 text-gray-400'
             ]"
           >

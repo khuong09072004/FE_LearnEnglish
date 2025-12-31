@@ -21,13 +21,13 @@
       </p>
     </div>
 
-    <!-- Ordered scrambled Display (Your Answer) -->
+    <!-- Ordered Words Display (Your Answer) -->
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-600 mb-2">Câu của bạn:</p>
       <div class="bg-purple-50 border-2 border-blue-200 rounded-lg p-4 min-h-[80px]">
-        <div v-if="orderedscrambled.length > 0" class="flex flex-wrap gap-2">
+        <div v-if="orderedWords.length > 0" class="flex flex-wrap gap-2">
           <div
-            v-for="(word, index) in orderedscrambled"
+            v-for="(word, index) in orderedWords"
             :key="'ordered-' + index"
             class="group relative"
           >
@@ -51,13 +51,13 @@
       </div>
     </div>
 
-    <!-- Available scrambled (scrambled) -->
+    <!-- Available Words (words) -->
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-600 mb-2">Các từ có sẵn:</p>
       <div class="bg-gray-50 rounded-lg p-4 min-h-[80px]">
-        <div v-if="availablescrambled.length > 0" class="flex flex-wrap gap-2">
+        <div v-if="availableWords.length > 0" class="flex flex-wrap gap-2">
           <button
-            v-for="(word, index) in availablescrambled"
+            v-for="(word, index) in availableWords"
             :key="'available-' + index"
             class="bg-white border-2 border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:border-blue-400 hover:bg-purple-50 transition-all duration-200 hover:scale-105"
             @click="addWord(word, index)"
@@ -72,7 +72,7 @@
     </div>
 
     <!-- Display Final Answer -->
-    <div v-if="orderedscrambled.length > 0" class="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
+    <div v-if="orderedWords.length > 0" class="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
       <p class="text-sm text-gray-600 mb-1">Câu hoàn chỉnh của bạn:</p>
       <p class="text-lg font-bold text-blue-700">{{ finalAnswer }}</p>
     </div>
@@ -81,8 +81,8 @@
     <div class="flex gap-3">
       <button
         class="flex-1 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold"
-        :disabled="orderedscrambled.length === 0"
-        :class="orderedscrambled.length === 0 ? 'opacity-50 cursor-not-allowed' : ''"
+        :disabled="orderedWords.length === 0"
+        :class="orderedWords.length === 0 ? 'opacity-50 cursor-not-allowed' : ''"
         @click="resetOrder"
       >
         🔄 Làm lại
@@ -90,7 +90,7 @@
     </div>
 
     <!-- Helper Text -->
-    <div v-if="orderedscrambled.length === 0" class="mt-6 flex items-start gap-2 text-sm text-gray-500">
+    <div v-if="orderedWords.length === 0" class="mt-6 flex items-start gap-2 text-sm text-gray-500">
       <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
@@ -101,7 +101,7 @@
 
 <script>
 export default {
-  name: 'GrammarReorder',
+  name: 'WriteReorder',
   
   props: {
     question: {
@@ -124,14 +124,14 @@ export default {
 
   data() {
     return {
-      orderedscrambled: [],
-      availablescrambled: [],
+      orderedWords: [],
+      availableWords: [],
     };
   },
 
   computed: {
     finalAnswer() {
-      return this.orderedscrambled.join(' ');
+      return this.orderedWords.join(' ');
     },
   },
 
@@ -139,7 +139,7 @@ export default {
     question: {
       immediate: true,
       handler() {
-        this.initializescrambled();
+        this.initializeWords();
       },
     },
 
@@ -154,33 +154,33 @@ export default {
   },
 
   methods: {
-    initializescrambled() {
-      const scrambled = this.question.question.scrambled || [];
+    initializeWords() {
+      const words = this.question.question.words || [];
       
       if (this.userAnswer) {
         this.parseUserAnswer(this.userAnswer);
       } else {
-        this.orderedscrambled = [];
+        this.orderedWords = [];
       }
       
-      this.updateAvailablescrambled();
+      this.updateAvailableWords();
     },
 
     parseUserAnswer(answerString) {
       // Parse "It is raining outside" back to ["It", "is", "reading book"]
-      // by matching against original scrambled array
-      const scrambled = this.question.question.scrambled || [];
+      // by matching against original words array
+      const words = this.question.question.words || [];
       const result = [];
       let remaining = answerString.trim();
       
-      while (remaining.length > 0 && result.length < scrambled.length) {
+      while (remaining.length > 0 && result.length < words.length) {
         let matched = false;
         
-        // Try to match each word from the original scrambled array
-        for (const word of scrambled) {
+        // Try to match each word from the original words array
+        for (const word of words) {
           // Skip if we've already used this word the maximum times
           const usedCount = result.filter(w => w === word).length;
-          const totalCount = scrambled.filter(w => w === word).length;
+          const totalCount = words.filter(w => w === word).length;
           if (usedCount >= totalCount) continue;
           
           // Check if remaining string starts with this word
@@ -196,62 +196,62 @@ export default {
         if (!matched) break;
       }
       
-      this.orderedscrambled = result;
-      this.updateAvailablescrambled();
+      this.orderedWords = result;
+      this.updateAvailableWords();
     },
 
-    updateAvailablescrambled() {
-      const scrambled = this.question.question.scrambled || [];
+    updateAvailableWords() {
+      const words = this.question.question.words || [];
       
-      // Count occurrences in scrambled
-      const countInscrambled = {};
-      scrambled.forEach(word => {
-        countInscrambled[word] = (countInscrambled[word] || 0) + 1;
+      // Count occurrences in words
+      const countInWords = {};
+      words.forEach(word => {
+        countInWords[word] = (countInWords[word] || 0) + 1;
       });
 
       // Count occurrences in ordered
       const countInOrdered = {};
-      this.orderedscrambled.forEach(word => {
+      this.orderedWords.forEach(word => {
         countInOrdered[word] = (countInOrdered[word] || 0) + 1;
       });
 
-      // Rebuild available scrambled
-      this.availablescrambled = [];
+      // Rebuild available words
+      this.availableWords = [];
       const added = {};
       
-      scrambled.forEach(word => {
+      words.forEach(word => {
         const usedCount = countInOrdered[word] || 0;
-        const totalCount = countInscrambled[word];
+        const totalCount = countInWords[word];
         const remainingCount = totalCount - usedCount;
         const alreadyAdded = added[word] || 0;
         
         if (alreadyAdded < remainingCount) {
-          this.availablescrambled.push(word);
+          this.availableWords.push(word);
           added[word] = alreadyAdded + 1;
         }
       });
     },
 
     addWord(word, index) {
-      this.orderedscrambled.push(word);
-      this.updateAvailablescrambled();
+      this.orderedWords.push(word);
+      this.updateAvailableWords();
       this.emitAnswer();
     },
 
     removeWord(index) {
-      this.orderedscrambled.splice(index, 1);
-      this.updateAvailablescrambled();
+      this.orderedWords.splice(index, 1);
+      this.updateAvailableWords();
       this.emitAnswer();
     },
 
     resetOrder() {
-      this.orderedscrambled = [];
-      this.updateAvailablescrambled();
+      this.orderedWords = [];
+      this.updateAvailableWords();
       this.emitAnswer();
     },
 
     emitAnswer() {
-      if (this.orderedscrambled.length > 0) {
+      if (this.orderedWords.length > 0) {
         this.$emit('answer', this.finalAnswer);
       } else {
         this.$emit('answer', null);

@@ -27,7 +27,16 @@ export function getExercisesItems(exerciseId ) {
       .catch((error) => reject(error));
   });
 }
-export function submitVocabExercise(exerciseId, answers) {
+export function getPassageById(passageId) {
+  const url = `/passages/${passageId}`;
+  return new Promise((resolve, reject) => {
+    axios
+      .get(url)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+export function submitVocabExercise(exerciseId, answers, timeSpentInSeconds = 0) {
   const url = `/results/vocab`;
   return new Promise((resolve, reject) => {
     axios
@@ -35,7 +44,68 @@ export function submitVocabExercise(exerciseId, answers) {
         exerciseId,
         answers: {
           answers: answers
-        }
+        },
+        timeSpentInSeconds
+      })
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+export function submitGrammarExercise(exerciseId, answers, timeSpentInSeconds = 0) {
+  const url = `/results/grammar`;
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url, {
+        exerciseId,
+        answers: {
+          answers: answers
+        },
+        timeSpentInSeconds
+      })
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+export function submitListeningExercise(exerciseId, answers, timeSpentInSeconds = 0) {
+  const url = `/results/listening`;
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url, {
+        exerciseId,
+        answers: {
+          answers: answers
+        },
+        timeSpentInSeconds
+      })
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+export function submitReadingExercise(exerciseId, answers, timeSpentInSeconds = 0) {
+  const url = `/results/reading`;
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url, {
+        exerciseId,
+        answers: {
+          answers: answers
+        },
+        timeSpentInSeconds
+      })
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+export function submitWritingExercise(exerciseId, answers, timeSpentInSeconds = 0) {
+  const url = `/results/writing`;
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url, {
+        exerciseId,
+        answers: {
+          answers: answers
+        },
+        timeSpentInSeconds
       })
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));

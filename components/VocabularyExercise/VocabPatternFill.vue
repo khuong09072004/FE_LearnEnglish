@@ -5,9 +5,9 @@
     </h3>
 
     <!-- Pattern Hint -->
-    <div class="mb-6 text-center p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border-2 border-orange-200">
-      <p class="text-sm text-orange-600 mb-2 font-semibold">Mẫu từ:</p>
-      <p class="text-4xl font-mono font-bold text-orange-800 tracking-widest">
+    <div class="mb-6 text-center p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border-2 border-blue-200">
+      <p class="text-sm text-blue-600 mb-2 font-semibold">Mẫu từ:</p>
+      <p class="text-4xl font-mono font-bold text-blue-800 tracking-widest">
         {{ question.question.pattern }}
       </p>
     </div>

@@ -1,25 +1,8 @@
 import axios from "axios";
 
-export function chooseLevel(body) {
-  const url = "/users/level";
-  return new Promise((resolve, reject) => {
-    axios
-      .put(url, body)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-}
-export function getListLevel() {
-  const url = "/levels";
-  return new Promise((resolve, reject) => {
-    axios
-      .get(url)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-}
-export function trackLearningProgress() {
-  const url = "/users/Tracking/level";
+// Lấy danh sách thông báo với phân trang
+export function getNotifications(page = 0, size = 10) {
+  const url = `/notifications?page=${page}&size=${size}`;
   return new Promise((resolve, reject) => {
     axios
       .get(url)
@@ -28,21 +11,45 @@ export function trackLearningProgress() {
   });
 }
 
-export function getAvailableLevels() {
-  const url = "/levels/available";
-  return new Promise((resolve, reject) => {
-    axios
-      .get(url)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-}
-
-export function selectLevel(code) {
-  const url = `/levels/select?code=${code}`;
+// Đánh dấu đã đọc thông báo
+export function markAsRead(notificationId) {
+  const url = `/notifications/${notificationId}/read`;
   return new Promise((resolve, reject) => {
     axios
       .post(url)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+
+// Đánh dấu tất cả thông báo đã đọc
+export function markAllAsRead() {
+  const url = `/notifications/read-all`;
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+
+// Xóa thông báo
+export function deleteNotification(notificationId) {
+  const url = `/notifications/${notificationId}`;
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(url)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+
+// Xóa tất cả thông báo
+export function deleteAllNotifications() {
+  const url = `/notifications`;
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(url)
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
   });
