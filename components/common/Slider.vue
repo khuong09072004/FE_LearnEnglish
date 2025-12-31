@@ -53,13 +53,20 @@
       </a-menu-item>
 
       <a-menu-item key="5">
-        <nuxt-link to="/files" @click.native="handleMobileClick">
-          <a-icon type="file" />
-          <span>Tệp tin</span>
+        <nuxt-link to="/conversation" @click.native="handleMobileClick">
+          <a-icon type="message" />
+          <span>Hội thoại</span>
         </nuxt-link>
       </a-menu-item>
 
       <a-menu-item key="6">
+        <nuxt-link to="/chat" @click.native="handleMobileClick">
+          <a-icon type="wechat" />
+          <span>Chat</span>
+        </nuxt-link>
+      </a-menu-item>
+
+      <a-menu-item key="7">
         <nuxt-link to="/games" @click.native="handleMobileClick">
           <a-icon type="robot" />
           <span>Trò chơi</span>

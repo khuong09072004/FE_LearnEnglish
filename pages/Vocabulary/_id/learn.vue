@@ -23,7 +23,7 @@
       <!-- CARD 3D - CHỈ THÊM "perspective-1000" VÀO ĐÂY LÀ XONG -->
       <div
         class="relative bg-white rounded-3xl shadow-2xl overflow-hidden cursor-pointer select-none perspective-1000"
-        @click="flipped = true"
+        @click="flipped = !flipped"
       >
         <div
           class="relative w-full h-96 preserve-3d transition-all duration-700"
@@ -46,7 +46,7 @@
               <a-icon type="sound" class="text-3xl" />
               <span class="text-xl">Nghe phát âm</span>
             </button>
-            <p class="mt-10 text-gray-400 text-lg">Bấm để lật thẻ</p>
+            <p class="mt-10 text-gray-400 text-lg">👆 Bấm để lật thẻ</p>
           </div>
 
           <!-- Mặt sau -->
@@ -72,6 +72,7 @@
                 />
               </div>
             </div>
+            <p class="mt-6 text-gray-500 text-sm">👆 Bấm lại để xem mặt trước</p>
           </div>
         </div>
       </div>

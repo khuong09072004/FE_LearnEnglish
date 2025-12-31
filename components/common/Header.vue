@@ -22,6 +22,10 @@
     <!-- Bên phải -->
     <div class="header-right">
       <template v-if="isLoggedIn">
+        <!-- Icon Thông báo -->
+        <NotificationDropdown :isLoggedIn="isLoggedIn" />
+
+        <!-- Avatar -->
         <a-popover trigger="click" placement="bottomRight">
           <template #content>
             <div class="user-popover">
@@ -41,6 +45,9 @@
                 </a-button>
                 <a-button type="link" block @click="goToEditProfile">
                   <a-icon type="edit" /> Sửa thông tin
+                </a-button>
+                <a-button type="link" block @click="goToTrackProgress">
+                  <a-icon type="bar-chart" /> Theo dõi tiến độ
                 </a-button>
                 <a-divider class="my-2" />
                 <a-button type="link" block danger @click="confirmLogout">
@@ -70,9 +77,13 @@
 
 <script>
 import { mapGetters } from "vuex";
+import NotificationDropdown from "./NotificationDropdown.vue";
 
 export default {
   name: "Header",
+  components: {
+    NotificationDropdown,
+  },
   props: {
     collapsed: { type: Boolean, default: false },
     isMobile: { type: Boolean, default: false },
@@ -111,6 +122,13 @@ export default {
       );
     },
   },
+  watch: {
+    notificationVisible(val) {
+      if (val && this.notifications.length === 0) {
+        this.fetchNotifications();
+      }
+    },
+  },
   methods: {
     confirmLogout() {
       this.$confirm({
@@ -130,6 +148,9 @@ export default {
     },
     goToEditProfile() {
       this.$router.push("/profile/edit");
+    },
+    goToTrackProgress() {
+      this.$router.push("/progress");
     },
   },
   mounted() {

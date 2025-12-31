@@ -367,7 +367,7 @@ export default {
           await this.loadPassage(this.exerciseData.passageId);
         }
 
-        this.startTimer(0.2);
+        this.startTimer(this.exerciseData.duration);
 
         
       } catch (error) {

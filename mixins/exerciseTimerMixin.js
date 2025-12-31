@@ -4,6 +4,8 @@ export default {
       timeLeft: 0,
       timerInterval: null,
       isTimeUp: false,
+      startTime: null, // Thời điểm bắt đầu làm bài
+      totalTimeLimit: 0, // Tổng thời gian được phép (giây)
     };
   },
 
@@ -13,12 +15,28 @@ export default {
       const seconds = this.timeLeft % 60;
       return `${minutes}:${seconds.toString().padStart(2, "0")}`;
     },
+    // Tính thời gian đã làm bài (giây)
+    timeSpentInSeconds() {
+      if (!this.startTime) return 0;
+      
+      // Nếu hết giờ thì return totalTimeLimit
+      if (this.isTimeUp && this.totalTimeLimit > 0) {
+        return this.totalTimeLimit;
+      }
+      
+      // Nếu còn thời gian thì tính từ lúc bắt đầu
+      const now = Date.now();
+      const elapsed = Math.floor((now - this.startTime) / 1000);
+      return elapsed;
+    },
   },
 
   methods: {
     startTimer(duration) {
       this.clearTimer();
       this.timeLeft = duration * 60;
+      this.totalTimeLimit = duration * 60; // Lưu tổng thời gian
+      this.startTime = Date.now(); // Lưu thời điểm bắt đầu
       this.isTimeUp = false;
 
       this.timerInterval = setInterval(() => {

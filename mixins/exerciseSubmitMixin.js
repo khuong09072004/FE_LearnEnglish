@@ -62,22 +62,24 @@ export default {
           answer: this.userAnswers[item.id] || "",
         }));
 
-        
+        // Tính thời gian làm bài (giây)
+        const timeSpent = this.timeSpentInSeconds || 0;
+        console.log(`⏱️ Time spent: ${timeSpent} seconds`);
 
         const exerciseId = parseInt(this.$route.params.id);
 
         let response;
 
         if (this.isGrammarExercise) {
-          response = await submitGrammarExercise(exerciseId, answers);
+          response = await submitGrammarExercise(exerciseId, answers, timeSpent);
         } else if (this.isListeningExercise) {
-          response = await submitListeningExercise(exerciseId, answers);
+          response = await submitListeningExercise(exerciseId, answers, timeSpent);
         } else if (this.isReadingExercise) {
-          response = await submitReadingExercise(exerciseId, answers);
+          response = await submitReadingExercise(exerciseId, answers, timeSpent);
         } else if (this.isWritingExercise) {
-          response = await submitWritingExercise(exerciseId, answers);
+          response = await submitWritingExercise(exerciseId, answers, timeSpent);
         } else {
-          response = await submitVocabExercise(exerciseId, answers);
+          response = await submitVocabExercise(exerciseId, answers, timeSpent);
         }
 
         
