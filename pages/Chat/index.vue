@@ -1,34 +1,44 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+  <div
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
+  >
     <!-- Animated Background -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-      <div class="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
-      <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+      <div
+        class="absolute top-20 left-10 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"
+      ></div>
+      <div
+        class="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"
+        style="animation-delay: 1s"
+      ></div>
+      <div
+        class="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl animate-pulse"
+        style="animation-delay: 2s"
+      ></div>
     </div>
 
     <div class="relative container mx-auto px-4 py-6 max-w-7xl">
       <!-- Header -->
       <div class="mb-6 flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold  flex items-center gap-3">
+          <h1 class="text-3xl font-bold flex items-center gap-3">
             <span class="text-4xl">💬</span>
             Chat Room
-            <span 
+            <span
               class="w-3 h-3 rounded-full animate-pulse"
               :class="isConnected ? 'bg-green-400' : 'bg-gray-500'"
             ></span>
           </h1>
           <p class="text-gray-600 mt-1">Kết nối và trò chuyện với mọi người</p>
         </div>
-        
+
         <!-- Reconnect Button (show only when disconnected) -->
-        <a-button 
+        <a-button
           v-if="!isConnected && !connecting"
-          type="primary" 
+          type="primary"
           ghost
           @click="connectWebSocket"
-          style="border-color: white; color: white;"
+          style="border-color: white; color: white"
         >
           <a-icon type="reload" /> Kết nối lại
         </a-button>
@@ -39,60 +49,34 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Topics List -->
         <div class="lg:col-span-4">
-          <div class="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
+          <div
+            class="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 shadow-2xl overflow-hidden"
+          >
             <div class="p-4 border-b border-white/10">
-              <h3 class=" font-semibold text-lg flex items-center gap-2">
+              <h3 class="font-semibold text-lg flex items-center gap-2">
                 <span class="text-xl">🎯</span> Chọn phòng chat
               </h3>
-              <p class="text-gray-600 text-sm mt-1">{{ topics.length }} phòng đang hoạt động</p>
+              <p class="text-gray-600 text-sm mt-1">
+                {{ topics.length }} phòng đang hoạt động
+              </p>
             </div>
-            
+
             <div class="p-3">
               <div v-if="loadingTopics" class="text-center py-8">
                 <a-spin />
                 <p class="text-gray-400 mt-2 text-sm">Đang tải...</p>
               </div>
-              <div v-else class="space-y-2 max-h-[550px] overflow-y-auto custom-scrollbar">
-                <div
+              <div
+                v-else
+                class="space-y-2 max-h-[550px] overflow-y-auto custom-scrollbar"
+              >
+                <TopicCard
                   v-for="topic in topics"
                   :key="`chat-${topic.id}`"
-                  class="group p-4 rounded-xl cursor-pointer transition-all duration-300 border"
-                  :class="chatTopicId === topic.id 
-                    ? 'bg-gradient-to-r from-blue-500/30 to-pink-500/30 border-blue-400/50 shadow-lg shadow-blue-500/20' 
-                    : 'border-white/10 hover:bg-white/10 hover:border-white/20'"
-                  @click="openJoinDialog(topic)"
-                >
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div 
-                        class="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-                        :class="chatTopicId === topic.id ? 'bg-blue-500' : 'bg-white/10'"
-                      >
-                        {{ getTopicEmoji(topic.id) }}
-                      </div>
-                      <div>
-                        <div class="font-semibold  group-hover:text-blue-300 transition">
-                          {{ topic.name }}
-                        </div>
-                        <div class="text-xs text-gray-600 flex items-center gap-1">
-                          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                          Online
-                        </div>
-                      </div>
-                    </div>
-                    <a-icon 
-                      v-if="chatTopicId === topic.id"
-                      type="check-circle" 
-                      theme="filled"
-                      class="text-blue-400 text-lg"
-                    />
-                    <a-icon 
-                      v-else
-                      type="right" 
-                      class="text-gray-500  transition opacity-0 group-hover:opacity-100"
-                    />
-                  </div>
-                </div>
+                  :topic="topic"
+                  :isActive="chatTopicId === topic.id"
+                  @click="openJoinDialog"
+                />
               </div>
             </div>
           </div>
@@ -100,29 +84,45 @@
 
         <!-- Chat Room -->
         <div class="lg:col-span-8">
-          <div class="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 shadow-2xl overflow-hidden flex flex-col" style="height: 650px;">
+          <div
+            class="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 shadow-2xl overflow-hidden flex flex-col"
+            style="height: 650px"
+          >
             <!-- Chat Header -->
-            <div class="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/50 to-pink-600/50">
+            <div
+              class="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/50 to-pink-600/50"
+            >
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <div 
+                  <div
                     v-if="chatTopicId"
                     class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl"
                   >
                     {{ getTopicEmoji(chatTopicId) }}
                   </div>
                   <div>
-                    <h2 class="text-xl font-bold ">
-                      {{ chatTopicId ? getTopicName(chatTopicId) : '👋 Chào mừng!' }}
+                    <h2 class="text-xl font-bold">
+                      {{
+                        chatTopicId
+                          ? getTopicName(chatTopicId)
+                          : "👋 Chào mừng!"
+                      }}
                     </h2>
                     <p class="text-gray-600 text-sm">
-                      {{ chatTopicId ? `${chatMessages.filter(m => m.type !== 'system').length} tin nhắn` : 'Chọn phòng chat để bắt đầu' }}
+                      {{
+                        chatTopicId
+                          ? `${
+                              chatMessages.filter((m) => m.type !== "system")
+                                .length
+                            } tin nhắn`
+                          : "Chọn phòng chat để bắt đầu"
+                      }}
                     </p>
                   </div>
                 </div>
-                
+
                 <!-- Leave Room Button -->
-                <a-button 
+                <a-button
                   v-if="chatTopicId"
                   type="danger"
                   ghost
@@ -135,7 +135,10 @@
             </div>
 
             <!-- Chat Messages -->
-            <div ref="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+            <div
+              ref="chatMessages"
+              class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar"
+            >
               <!-- Loading Messages -->
               <div v-if="loadingMessages" class="text-center py-12">
                 <a-spin size="large" />
@@ -145,91 +148,34 @@
               <!-- Welcome Screen -->
               <div v-else-if="!chatTopicId" class="text-center py-16">
                 <div class="text-8xl mb-4 animate-bounce">💭</div>
-                <h3 class="text-2xl font-bold  mb-2">Bắt đầu trò chuyện</h3>
+                <h3 class="text-2xl font-bold mb-2">Bắt đầu trò chuyện</h3>
                 <p class="text-gray-600 max-w-md mx-auto">
-                  Chọn một phòng chat từ danh sách bên trái để tham gia cuộc trò chuyện với mọi người
+                  Chọn một phòng chat từ danh sách bên trái để tham gia cuộc trò
+                  chuyện với mọi người
                 </p>
               </div>
 
               <!-- Empty Messages -->
-              <div v-else-if="chatMessages.length === 0" class="text-center py-16">
+              <div
+                v-else-if="chatMessages.length === 0"
+                class="text-center py-16"
+              >
                 <div class="text-6xl mb-4">🎉</div>
-                <h3 class="text-xl font-bold  mb-2">Phòng chat trống</h3>
+                <h3 class="text-xl font-bold mb-2">Phòng chat trống</h3>
                 <p class="text-gray-400">Hãy là người đầu tiên gửi tin nhắn!</p>
               </div>
 
               <!-- Messages -->
               <template v-else>
-                <div
+                <ChatMessageItem
                   v-for="(msg, index) in chatMessages"
                   :key="index"
-                  class="flex animate-fadeIn"
-                  :class="msg.isOwn ? 'justify-end' : 'justify-start'"
-                >
-                  <!-- System Message -->
-                  <div 
-                    v-if="msg.type === 'system'"
-                    class="w-full text-center"
-                  >
-                    <span class="inline-block px-4 py-1 rounded-full bg-white/5 text-gray-400 text-sm border border-white/10">
-                      {{ msg.content }}
-                    </span>
-                  </div>
-
-                  <!-- User Message -->
-                  <template v-else>
-                    <!-- Avatar - Left -->
-                    <div v-if="!msg.isOwn" class="mr-3 flex-shrink-0">
-                      <a-avatar
-                        v-if="msg.senderAvatar"
-                        :src="msg.senderAvatar"
-                        :size="40"
-                        class="ring-2 ring-white/20"
-                      />
-                      <a-avatar
-                        v-else
-                        :size="40"
-                        class="ring-2 ring-blue-400/50"
-                        style="backgroundColor: #7c3aed"
-                      >
-                        {{ (msg.senderName || 'U')[0].toUpperCase() }}
-                      </a-avatar>
-                    </div>
-
-                    <div
-                      class="max-w-[70%] rounded-2xl px-4 py-3 shadow-lg"
-                      :class="msg.isOwn 
-                        ? 'bg-gradient-to-r from-blue-500 to-pink-500  rounded-br-sm' 
-                        : 'bg-white/10 backdrop-blur border border-white/10  rounded-bl-sm'"
-                    >
-                      <div v-if="!msg.isOwn" class="text-xs font-semibold mb-1 text-blue-500">
-                        {{ msg.senderName || 'User' }}
-                      </div>
-                      <div class="text-sm break-words leading-relaxed">{{ msg.content }}</div>
-                      <div class="text-xs mt-2 opacity-60 text-right">
-                        {{ formatTime(msg.timestamp) }}
-                      </div>
-                    </div>
-
-                    <!-- Avatar - Right -->
-                    <div v-if="msg.isOwn" class="ml-3 flex-shrink-0">
-                      <a-avatar
-                        v-if="$store.getters['auth/user']?.avatar"
-                        :src="$store.getters['auth/user'].avatar"
-                        :size="40"
-                        class="ring-2 ring-blue-400/50"
-                      />
-                      <a-avatar
-                        v-else
-                        :size="40"
-                        class="ring-2 ring-pink-400/50"
-                        style="backgroundColor: #ec4899"
-                      >
-                        {{ ($store.getters['auth/user']?.name || 'Me')[0].toUpperCase() }}
-                      </a-avatar>
-                    </div>
-                  </template>
-                </div>
+                  :message="msg"
+                  :currentUser="$store.getters['auth/user']"
+                  class="animate-fadeIn mb-4"
+                  @edit="showEditModal"
+                  @delete="confirmDeleteMessage"
+                />
               </template>
             </div>
 
@@ -248,9 +194,11 @@
                   type="primary"
                   size="large"
                   @click="sendChatMessage"
-                  :disabled="!isConnected || !chatTopicId || !messageInput.trim()"
+                  :disabled="
+                    !isConnected || !chatTopicId || !messageInput.trim()
+                  "
                   :loading="sending"
-                  style=" border: none; font-weight: bold;   border-radius: 4px;"
+                  style="border: none; font-weight: bold; border-radius: 4px"
                   class="px-6"
                 >
                   Gửi
@@ -272,58 +220,105 @@
       :width="400"
       class="join-modal"
     >
-      <div class="bg-blue-400 p-6 text-center ">
-        <div class="text-5xl mb-3">{{ selectedTopic ? getTopicEmoji(selectedTopic.id) : '💬' }}</div>
+      <div class="bg-blue-400 p-6 text-center">
+        <div class="text-5xl mb-3">
+          {{ selectedTopic ? getTopicEmoji(selectedTopic.id) : "💬" }}
+        </div>
         <h3 class="text-xl font-bold text-white">{{ selectedTopic?.name }}</h3>
         <p class="text-white text-sm mt-1">Bạn muốn tham gia phòng chat này?</p>
       </div>
       <div class="p-6 bg-white">
         <div class="flex gap-3">
-          <a-button 
-            block 
-            size="large"
-            @click="joinModalVisible = false"
-          >
+          <a-button block size="large" @click="joinModalVisible = false">
             Hủy
           </a-button>
-          <a-button 
-            block 
+          <a-button
+            block
             size="large"
             type="primary"
             :loading="loadingMessages"
             @click="confirmJoinRoom"
-            style="background:  #4facfe; border: none; color: white; border-radius: 4px; font-weight: bold;"
+            style="
+              background: #4facfe;
+              border: none;
+              color: white;
+              border-radius: 4px;
+              font-weight: bold;
+            "
           >
             Vào phòng
           </a-button>
         </div>
       </div>
     </a-modal>
+
+    <!-- Edit Message Modal -->
+    <a-modal
+      v-model="editModalVisible"
+      :footer="null"
+      centered
+      :width="480"
+      class="edit-message-modal"
+    >
+      <div class="modal-header">
+        <h3 class="text-lg font-semibold text-black">Chỉnh sửa tin nhắn</h3>
+      </div>
+      <div class="modal-content">
+        <a-textarea
+          v-model="editingContent"
+          placeholder="Nhập nội dung tin nhắn..."
+          :rows="4"
+          :maxLength="500"
+          class="message-textarea"
+        />
+        <div class="text-xs text-gray-400 mt-1 text-right">
+          {{ editingContent.length }}/500
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a-button @click="editModalVisible = false" size="large" class="cancel-btn">
+          Hủy
+        </a-button>
+        <a-button
+          type="primary"
+          @click="handleEditMessage"
+          size="large"
+          class="save-btn"
+        >
+          Lưu thay đổi
+        </a-button>
+      </div>
+    </a-modal>
   </div>
 </template>
 
 <script>
-import { getListTopic } from '~/apis/vocabularies';
-import { getMessages } from '~/apis/chat';
-import chatService from '~/services/chatService';
+import { getListTopic } from "~/apis/vocabularies";
+import chatService from "~/services/chatService";
+import chatConnectionMixin from "~/mixins/chatConnectionMixin";
+import chatMessagesMixin from "~/mixins/chatMessagesMixin";
+import TopicCard from "~/components/Chat/TopicCard.vue";
+import ChatMessageItem from "~/components/Chat/ChatMessageItem.vue";
 
 export default {
-  name: 'ChatPage',
-  layout: 'pageLayout',
+  name: "ChatPage",
+  layout: "pageLayout",
   
+  mixins: [chatConnectionMixin, chatMessagesMixin],
+
+  components: {
+    TopicCard,
+    ChatMessageItem,
+  },
+
   data() {
     return {
       topics: [],
       loadingTopics: true,
-      
+
       chatTopicId: null,
-      isConnected: false,
-      connecting: false,
-      chatMessages: [],
-      messageInput: '',
-      sending: false,
-      loadingMessages: false,
-      
+      messageInput: "",
+
       // Modal
       joinModalVisible: false,
       selectedTopic: null,
@@ -345,24 +340,35 @@ export default {
       this.loadingTopics = true;
       try {
         const response = await getListTopic();
-        if (response.status === 'success' && response.data) {
+        if (response.status === "success" && response.data) {
           this.topics = response.data;
         }
       } catch (error) {
-        console.error('Error loading topics:', error);
-        this.$message.error('Không thể tải danh sách chủ đề');
+        console.error("Error loading topics:", error);
+        this.$message.error("Không thể tải danh sách chủ đề");
       } finally {
         this.loadingTopics = false;
       }
     },
 
     getTopicName(topicId) {
-      const topic = this.topics.find(t => t.id === topicId);
+      const topic = this.topics.find((t) => t.id === topicId);
       return topic ? topic.name : `Topic ${topicId}`;
     },
 
     getTopicEmoji(topicId) {
-      const emojis = ['💬', '🎯', '📚', '🌟', '🎨', '🎵', '🏆', '💡', '🔥', '✨'];
+      const emojis = [
+        "💬",
+        "🎯",
+        "📚",
+        "🌟",
+        "🎨",
+        "🎵",
+        "🏆",
+        "💡",
+        "🔥",
+        "✨",
+      ];
       return emojis[topicId % emojis.length];
     },
 
@@ -370,7 +376,7 @@ export default {
     openJoinDialog(topic) {
       if (this.chatTopicId === topic.id) return; // Already in this room
       if (!this.isConnected) {
-        this.$message.warning('Đang kết nối, vui lòng đợi...');
+        this.$message.warning("Đang kết nối, vui lòng đợi...");
         return;
       }
       this.selectedTopic = topic;
@@ -386,84 +392,48 @@ export default {
 
     showLeaveConfirm() {
       this.$confirm({
-        title: 'Rời phòng chat?',
-        content: `Bạn có chắc muốn rời khỏi phòng "${this.getTopicName(this.chatTopicId)}"?`,
-        okText: 'Rời phòng',
-        okType: 'danger',
-        cancelText: 'Ở lại',
+        title: "Rời phòng chat?",
+        content: `Bạn có chắc muốn rời khỏi phòng "${this.getTopicName(
+          this.chatTopicId
+        )}"?`,
+        okText: "Rời phòng",
+        okType: "danger",
+        cancelText: "Ở lại",
         centered: true,
         onOk: () => {
           this.leaveRoom();
-        }
+        },
       });
     },
 
     leaveRoom() {
-      this.addSystemMessage(`👋 Đã rời khỏi ${this.getTopicName(this.chatTopicId)}`);
+      this.addSystemMessage(
+        `👋 Đã rời khỏi ${this.getTopicName(this.chatTopicId)}`
+      );
       this.chatTopicId = null;
       this.chatMessages = [];
-      this.$message.info('Đã rời phòng chat');
+      this.$message.info("Đã rời phòng chat");
     },
 
     // ========== Chat Service Methods ==========
-    initChatService() {
-      // Đăng ký các event listeners
-      chatService.on('onConnect', () => {
-        this.isConnected = true;
-        this.connecting = false;
-      });
-
-      chatService.on('onDisconnect', () => {
-        this.isConnected = false;
-      });
-
-      chatService.on('onError', (error) => {
-        this.isConnected = false;
-        this.connecting = false;
-        this.$message.error('Không thể kết nối');
-      });
-    },
-
-    async connectToChat() {
-      this.connecting = true;
-
-      try {
-        await chatService.connect();
-      } catch (error) {
-        console.error('Connect error:', error);
-        if (error.message === 'Không tìm thấy token') {
-          this.$message.error('Vui lòng đăng nhập để sử dụng chat');
-          this.$router.push('/Login');
-        }
-      }
-    },
-
-    async disconnectChat() {
-      try {
-        await chatService.disconnect();
-      } catch (error) {
-        console.error('Disconnect error:', error);
-      }
-    },
-
-    connectWebSocket() {
-      this.connectToChat();
-    },
+    // Đã chuyển sang chatConnectionMixin
 
     disconnectWebSocket() {
-      this.addSystemMessage('🔻 Đang ngắt kết nối...');
+      this.addSystemMessage("🔻 Đang ngắt kết nối...");
       this.disconnectChat();
       this.chatTopicId = null;
     },
 
     async joinChatTopic(topicId) {
       if (!this.isConnected) {
-        this.$message.warning('Vui lòng đợi kết nối');
+        this.$message.warning("Vui lòng đợi kết nối");
         return;
       }
 
       if (this.chatTopicId) {
-        this.addSystemMessage(`🚪 Rời khỏi ${this.getTopicName(this.chatTopicId)}`);
+        this.addSystemMessage(
+          `🚪 Rời khỏi ${this.getTopicName(this.chatTopicId)}`
+        );
       }
 
       this.chatTopicId = topicId;
@@ -473,7 +443,7 @@ export default {
       try {
         // Load lịch sử tin nhắn
         await this.loadChatHistory(topicId);
-        
+
         // Subscribe để nhận tin nhắn mới
         await chatService.subscribeToTopic(topicId, (message) => {
           this.handleIncomingMessage(message);
@@ -482,110 +452,21 @@ export default {
         this.addSystemMessage(`✅ Đã tham gia ${this.getTopicName(topicId)}`);
       } catch (error) {
         this.addSystemMessage(`❌ Lỗi: ${error.message}`);
-        console.error('Subscribe error:', error);
+        console.error("Subscribe error:", error);
       }
     },
 
-    async sendChatMessage() {
-      if (!this.isConnected || !this.chatTopicId) return;
-
-      const content = this.messageInput.trim();
-      if (!content) return;
-
-      this.sending = true;
-
-      try {
-        await chatService.sendMessage(this.chatTopicId, content);
-        this.messageInput = '';
-      } catch (error) {
-        this.$message.error('Gửi thất bại');
-        console.error('Send error:', error);
-      } finally {
-        this.sending = false;
-      }
-    },
-
-    handleIncomingMessage(message) {
-      const user = this.$store.getters['auth/user'];
-      const currentUserId = user?.id || user?.userId;
-
-      this.chatMessages.push({
-        content: message.content,
-        senderName: message.senderName || message.senderId,
-        senderId: message.senderId,
-        senderAvatar: message.senderAvatar,
-        timestamp: message.timestamp || new Date(),
-        isOwn: message.senderId === currentUserId,
-        type: 'message'
-      });
-
-      this.$nextTick(() => {
-        this.scrollToBottom();
-      });
-    },
-
-    async loadChatHistory(topicId) {
-      this.loadingMessages = true;
-      try {
-        const response = await getMessages(topicId, 0, 50);
-        
-        if (response.status === 'success' && response.data) {
-          const user = this.$store.getters['auth/user'];
-          const currentUserId = user?.id || user?.userId;
-          
-          // Đảo ngược mảng để hiển thị tin nhắn cũ nhất trước
-          const messages = response.data.reverse().map(msg => ({
-            content: msg.content,
-            senderName: msg.senderName,
-            senderId: msg.senderId,
-            senderAvatar: msg.senderAvatar,
-            timestamp: msg.sentAt,
-            isOwn: msg.senderId === currentUserId,
-            type: 'message'
-          }));
-          
-          // Thêm tin nhắn lịch sử vào đầu
-          this.chatMessages = [...messages, ...this.chatMessages];
-          
-          this.$nextTick(() => {
-            this.scrollToBottom();
-          });
-        }
-      } catch (error) {
-        console.error('Load chat history error:', error);
-        this.$message.warning('Không thể tải lịch sử chat');
-      } finally {
-        this.loadingMessages = false;
-      }
-    },
-
-    addSystemMessage(content) {
-      this.chatMessages.push({
-        content,
-        type: 'system',
-        timestamp: new Date(),
-        isOwn: false
-      });
-
-      this.$nextTick(() => {
-        this.scrollToBottom();
-      });
-    },
-
-    scrollToBottom() {
-      if (this.$refs.chatMessages) {
-        this.$refs.chatMessages.scrollTop = this.$refs.chatMessages.scrollHeight;
-      }
-    },
-
-    formatTime(timestamp) {
-      if (!timestamp) return '';
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString('vi-VN', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-    },
+    // Các methods xử lý messages đã chuyển sang chatMessagesMixin
+    // - sendChatMessage()
+    // - handleIncomingMessage()
+    // - loadChatHistory()
+    // - addSystemMessage()
+    // - scrollToBottom()
+    // - formatTime()
+    // - showEditModal()
+    // - handleEditMessage()
+    // - confirmDeleteMessage()
+    // - handleDeleteMessage()
   },
 };
 </script>
@@ -595,7 +476,6 @@ export default {
   max-width: 1400px;
 }
 
-/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -614,7 +494,6 @@ export default {
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Chat Input Styling */
 .chat-input >>> .ant-input {
   background: rgba(255, 255, 255, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -638,7 +517,6 @@ export default {
   cursor: not-allowed;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -654,7 +532,79 @@ export default {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Modal Styling */
+.edit-message-modal >>> .ant-modal-content {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.edit-message-modal >>> .ant-modal-body {
+  padding: 0;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-content {
+  padding: 20px 24px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f9fafb;
+}
+
+.message-textarea >>> .ant-input {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 10px 12px;
+  transition: all 0.2s;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+.message-textarea >>> .ant-input:hover {
+  border-color: #2563eb;
+}
+
+.message-textarea >>> .ant-input:focus {
+  background: white;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+.cancel-btn {
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  border-radius: 6px;
+}
+
+.cancel-btn:hover {
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.save-btn {
+  background: #2563eb;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.save-btn:hover {
+  background: #1d4ed8;
+}
+
 .join-modal >>> .ant-modal-content {
   border-radius: 16px !important;
   overflow: hidden;

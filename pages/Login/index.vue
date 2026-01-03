@@ -131,8 +131,10 @@ export default {
         await this.$store.dispatch("auth/login", {
           token: data.data.token,
           name: data.data.name,
+          id: data.data.id,
           email: data.data.email,
           avatar: data.data.avatar,
+          typeAccount: data.data.typeAccount,
           has_selected_level: data.data.has_selected_level,
         });
 
@@ -166,15 +168,18 @@ export default {
 
     async handleGoogleResponse(response) {
       const id_token = response.credential;
-     
+      console.log('idgg:', id_token);
 
       try {
         const data = await loginWithGoogle({ id_token });
+        console.log('User ID:', data.id);
         await this.$store.dispatch("auth/login", {
           token: data.token,
+          id: data.id,
           name: data.name,
           email: data.email,
           avatar: data.avatar,
+          typeAccount: data.typeAccount,
           has_selected_level: data.has_selected_level,
         });
 
