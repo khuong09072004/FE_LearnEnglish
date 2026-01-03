@@ -24,6 +24,7 @@ export default {
     isLoggedIn: (state) => state.isLoggedIn,
     token: (state) => state.token,
     user: (state) => state.user,
+    userId: (state) => state.user?.id || null, // ✅ Thêm getter userId
     displayName: (state) => state.user?.name || "",
     avatar: (state) => state.user?.avatar || null,
     email: (state) => state.user?.email || "",
@@ -43,9 +44,16 @@ export default {
 
   actions: {
     login({ commit }, payload) {
-      const { token, name, email, avatar,has_selected_level } = payload;
+      const { token, name, email, avatar, has_selected_level, id,typeAccount } = payload;
 
-      const user = { name, email, avatar,has_selected_level}; 
+      const user = { 
+        id, // ✅ Lưu id từ BE
+        name, 
+        email, 
+        avatar, 
+        has_selected_level ,
+        typeAccount
+      }; 
 
       commit("setIsLoggedIn", true);
       commit("setToken", token);

@@ -2,9 +2,21 @@
   <header class="app-header">
     <!-- Bên trái -->
     <div class="header-left">
-      <!-- Nút menu cho mobile -->
+      <!-- Nút back hoặc menu -->
       <template v-if="isLoggedIn">
+        <!-- Nút quay lại khi ở trang profile -->
         <span 
+          v-if="showBackButton"
+          class="back-button" 
+          @click="$emit('goBack')"
+        >
+        <a-icon type="left" />
+          <span class="back-text">Quay lại</span>
+        </span>
+        
+        <!-- Nút menu thông thường -->
+        <span 
+          v-else
           class="trigger" 
           @click="isMobile ? $emit('menuToggle') : $emit('toggle')"
         >
@@ -42,9 +54,6 @@
               <div class="action-buttons">
                 <a-button type="link" block @click="goToProfile">
                   <a-icon type="user" /> Xem trang cá nhân
-                </a-button>
-                <a-button type="link" block @click="goToEditProfile">
-                  <a-icon type="edit" /> Sửa thông tin
                 </a-button>
                 <a-button type="link" block @click="goToTrackProgress">
                   <a-icon type="bar-chart" /> Theo dõi tiến độ
@@ -87,6 +96,7 @@ export default {
   props: {
     collapsed: { type: Boolean, default: false },
     isMobile: { type: Boolean, default: false },
+    showBackButton: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -195,6 +205,24 @@ export default {
 
 .trigger:hover {
   color: #1890ff;
+}
+
+.back-button {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  opacity: 0.8;
+  font-weight: 700;
+}
+
+.back-button .anticon {
+  font-size: 14px;
+}
+
+.back-text {
+  font-size: 14px;
 }
 
 .title-star {

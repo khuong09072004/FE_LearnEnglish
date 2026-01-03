@@ -107,6 +107,8 @@ export default {
     onSelect({ key }) {
       this.localSelectedKeys = [key];
       this.$emit("update:selectedKeys", [key]);
+      // Emit itemClick để parent biết đã click vào menu
+      this.$emit("itemClick");
     },
     handleMobileClick() {
       // Đóng sidebar khi click vào menu item trên mobile

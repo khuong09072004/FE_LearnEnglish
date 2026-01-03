@@ -37,14 +37,15 @@ export function deleteMessage(messageId) {
   });
 }
 
-// Báo cáo tin nhắn
-export function reportMessage(messageId, reason) {
-  const url = `/chat/messages/${messageId}/report`;
+// Sửa tin nhắn
+export function updateMessage(messageId, content) {
+  const url = `/chat/messages/${messageId}`;
   return new Promise((resolve, reject) => {
     axios
-      .post(url, { reason })
+      .put(url, null, {
+        params: { content }
+      })
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
   });
 }
-

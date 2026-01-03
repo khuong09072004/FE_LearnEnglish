@@ -1,12 +1,13 @@
 <template>
   <div v-if="isLoggedIn" class="app-container">
     <a-layout class="main-layout">
-      <!-- Sidebar với responsive -->
+      <!-- Sidebar với responsive - Collapse khi ở trang profile -->
       <Sider 
         :collapsed="collapsed" 
         :selectedKeys="selectedKeys"
         :class="{'mobile-sidebar': isMobile, 'show': showMobileSidebar}"
         @close="showMobileSidebar = false"
+        @itemClick="handleSidebarItemClick"
       />
       
       <!-- Overlay cho mobile sidebar -->
@@ -22,8 +23,10 @@
           <Header 
             :collapsed="collapsed" 
             :isMobile="isMobile"
+            :showBackButton="isProfilePage"
             @toggle="handleToggle"
-            @menuToggle="showMobileSidebar = !showMobileSidebar" 
+            @menuToggle="showMobileSidebar = !showMobileSidebar"
+            @goBack="goBack"
           />
         </div>
         <div class="content-wrapper">
@@ -54,10 +57,28 @@ export default {
   computed: {
     isLoggedIn() {
       return this.$store.state.auth.token !== null;
+    },
+    isProfilePage() {
+      return this.$route.path === '/profile' || this.$route.path.startsWith('/Profile');
+    }
+  },
+  watch: {
+    // Tự động đóng mobile sidebar khi chuyển trang
+    '$route'() {
+      if (this.isMobile && this.showMobileSidebar) {
+        this.showMobileSidebar = false;
+      }
+      // Tự động collapse sidebar khi vào trang Profile
+      if (this.isProfilePage) {
+        this.collapsed = true;
+      }
+      // Cập nhật selectedKeys dựa trên route
+      this.updateSelectedKeys();
     }
   },
   mounted() {
     this.checkDevice();
+    this.updateSelectedKeys(); // Cập nhật selectedKeys khi mount
     window.addEventListener('resize', this.handleResize);
   },
   beforeDestroy() {
@@ -86,9 +107,44 @@ export default {
       if (!this.isMobile) {
         this.collapsed = !this.collapsed;
       }
+    },
+    handleSidebarItemClick() {
+      // Đóng sidebar khi click vào menu item trên mobile
+      if (this.isMobile) {
+        this.showMobileSidebar = false;
+      }
+    },
+    goBack() {
+      this.collapsed = false;
+      this.$router.go(-1);
+    },
+    updateSelectedKeys() {
+      // Map route path to menu key
+      const path = this.$route.path.toLowerCase();
+      const routeMap = {
+        '/home': '1',
+        '/vocabulary': '2',
+        '/grammar': '3',
+        '/exercise': '4',
+        '/conversation': '5',
+        '/chat': '6',
+        '/games': '7'
+      };
+      
+      // Tìm key tương ứng với route hiện tại
+      for (const [route, key] of Object.entries(routeMap)) {
+        if (path.startsWith(route)) {
+          this.selectedKeys = [key];
+          return;
+        }
+      }
+      
+      // Mặc định chọn Trang Chủ nếu không khớp
+      this.selectedKeys = ['1'];
     }
   }
 };
+
 </script>
 
 <style scoped>
