@@ -165,7 +165,7 @@
 
 <script>
 export default {
-  layout: 'pageLayout',
+  layout: 'exerciseLayout',
   middleware: 'auth',
   name: 'ExerciseResult',
 

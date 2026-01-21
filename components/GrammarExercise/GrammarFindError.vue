@@ -66,7 +66,7 @@
       class="mt-4 w-full py-2 text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
       @click="resetAnswer"
     >
-      🔄 Xóa
+       Xóa
     </button>
   </div>
 </template>

@@ -60,9 +60,9 @@ export const useAvatar = (profileData) => {
             has_selected_level: profileData.value ? !!profileData.value.Level : false,
           });
 
-          $message.success('✅ Cập nhật avatar thành công!', 3);
+          $message.success(' Cập nhật avatar thành công!', 3);
         } else {
-          $message.error('❌ Không nhận được dữ liệu từ server');
+          $message.error('Không nhận được dữ liệu từ server');
         }
       } catch (error) {
         $message.destroy();
@@ -74,7 +74,7 @@ export const useAvatar = (profileData) => {
           };
         }
         const errorMsg = error.response?.data?.message || 'Có lỗi khi upload avatar';
-        $message.error('❌ ' + errorMsg, 3);
+        $message.error(  errorMsg, 3);
       } finally {
         loading.value = false;
       }

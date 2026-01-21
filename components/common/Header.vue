@@ -185,7 +185,6 @@ export default {
   border-radius: 18px;
   box-shadow: 0 2px 6px #2553b91a;
 }
-
 .header-left {
   display: flex;
   align-items: center;
@@ -193,7 +192,6 @@ export default {
   flex: 1;
   min-width: 0;
 }
-
 .trigger {
   display: flex;
   cursor: pointer;
@@ -202,11 +200,9 @@ export default {
   transition: color 0.3s;
   flex-shrink: 0;
 }
-
 .trigger:hover {
   color: #1890ff;
 }
-
 .back-button {
   display: flex;
   cursor: pointer;
@@ -216,7 +212,6 @@ export default {
   opacity: 0.8;
   font-weight: 700;
 }
-
 .back-button .anticon {
   font-size: 14px;
 }
@@ -224,14 +219,12 @@ export default {
 .back-text {
   font-size: 14px;
 }
-
 .title-star {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
-
 .star-icon {
   font-size: 22px;
   flex-shrink: 0;

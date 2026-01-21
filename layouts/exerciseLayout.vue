@@ -36,19 +36,15 @@
         </div>
       </a-layout>
     </a-layout>
-
-    <!-- Chatbot Widget -->
-    <ChatBot />
   </div>
 </template>
 
 <script>
 import Header from "../components/common/Header.vue";
 import Sider from "../components/common/Slider.vue";
-import ChatBot from "../components/common/ChatBot.vue";
 
 export default {
-  components: { Header, Sider, ChatBot },
+  components: { Header, Sider },
   data() {
     return {
       collapsed: false,
