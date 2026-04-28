@@ -11,8 +11,8 @@
       </div>
 
       <!-- Right Side - Topics List -->
-      <div class="flex-1 bg-white overflow-y-auto p-4 sm:p-6 lg:p-8">
-        <div class="max-w-2xl mx-auto">
+      <div class="flex-1 bg-white overflow-y-auto p-4 sm:p-6 lg:p-8 max-h-screen">
+        <div class="max-w-2xl mx-auto pb-8">
           <!-- Breadcrumb -->
           <div v-if="activeTopic || activeCategory" class="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 flex flex-wrap items-center gap-1">
             <button class="hover:text-blue-500 cursor-pointer font-medium" @click="resetAll">Home</button>
@@ -382,8 +382,45 @@ export default {
 
       // Dialog state
       showDialog: false,
-      selectedExercise: null
+      selectedExercise: null,
+
+      // Pagination
+      currentPage: 1,
+      itemsPerPage: 5
     };
+  },
+
+  computed: {
+    // Tính tổng số trang
+    totalPages() {
+      return Math.ceil(this.topics.length / this.itemsPerPage);
+    },
+
+    // Lấy topics cho trang hiện tại
+    paginatedTopics() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.topics.slice(start, end);
+    },
+
+    // Các trang hiển thị (tối đa 5 trang)
+    visiblePages() {
+      const pages = [];
+      const maxVisible = 5;
+      let startPage = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(this.totalPages, startPage + maxVisible - 1);
+
+      // Điều chỉnh lại nếu không đủ trang ở cuối
+      if (endPage - startPage + 1 < maxVisible) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      return pages;
+    }
   },
 
   mounted() {
@@ -533,6 +570,20 @@ export default {
     resetAll() {
       this.activeTopic = null;
       this.resetCategoryAndExercises();
+    },
+
+    // Chuyển trang
+    changePage(page) {
+      if (page < 1 || page > this.totalPages) return;
+      
+      this.currentPage = page;
+      
+      // Reset các topic đang mở khi chuyển trang
+      this.activeTopic = null;
+      this.resetCategoryAndExercises();
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
     // Retry action cuối cùng bị fail

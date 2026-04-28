@@ -66,7 +66,7 @@
       class="mt-4 w-full py-2 text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
       @click="resetAnswer"
     >
-      🔄 Xóa
+       Xóa
     </button>
   </div>
 </template>
@@ -115,8 +115,22 @@ export default {
         const text = parts[label];
         const index = sentence.indexOf(text, currentPos);
         if (index !== -1) {
+          const labelToken = `(${label})`;
+          const markerStart = sentence.lastIndexOf(labelToken, index);
+
+          let start = index;
+          if (markerStart !== -1) {
+            const between = sentence.substring(
+              markerStart + labelToken.length,
+              index
+            );
+            if (/^\s*$/.test(between)) {
+              start = markerStart;
+            }
+          }
+
           positions.push({
-            start: index,
+            start,
             end: index + text.length,
             label: label,
             text: text,

@@ -144,18 +144,26 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-4 mt-6">
+        <div class="flex flex-col sm:flex-row gap-4 mt-6">
           <button
             class="flex-1 px-6 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl"
             @click="goToExerciseList"
           >
             Quay lại bài tập
           </button>
+          
           <button
-            class="flex-1 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl"
+            class="flex-1 px-6 py-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl"
             @click="retryExercise"
           >
             Thử Lại 
+          </button>
+          <button
+            class="flex-1 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+            :disabled="goingNext"
+            @click="goToNextExercise"
+          >
+            {{ goingNext ? 'Đang mở...' : 'Bài tiếp theo' }}
           </button>
         </div>
       </div>
@@ -164,8 +172,10 @@
 </template>
 
 <script>
+import { getExercisesItems } from '../../../apis/exercise';
+
 export default {
-  layout: 'pageLayout',
+  layout: 'exerciseLayout',
   middleware: 'auth',
   name: 'ExerciseResult',
 
@@ -173,7 +183,8 @@ export default {
     return {
       resultData: null,
       loading: false,
-      error: null
+      error: null,
+      goingNext: false
     };
   },
 
@@ -202,6 +213,16 @@ export default {
       if (score >= 60) return '🙂 Không tệ!';
       if (score >= 50) return '😐 Tiếp tục cố gắng!';
       return '💪 Luyện tập thêm!';
+    },
+
+    nextExerciseId() {
+      const nextId =
+        this.resultData?.nextExerciseId ||
+        this.resultData?.nextId ||
+        this.resultData?.nextExercise?.id;
+
+      const parsedId = Number(nextId);
+      return Number.isFinite(parsedId) && parsedId > 0 ? parsedId : null;
     },
 
     formattedCompletionTime() {
@@ -262,6 +283,37 @@ export default {
 
     retryExercise() {
       this.$router.push(`/exercise/${this.resultData.exerciseId}`);
+    },
+
+    async goToNextExercise() {
+      if (this.goingNext) return;
+      this.goingNext = true;
+
+      try {
+        // Ưu tiên dùng id bài tiếp theo nếu backend đã trả về.
+        if (this.nextExerciseId) {
+          this.$router.push(`/exercise/${this.nextExerciseId}`);
+          return;
+        }
+
+        const currentExerciseId = Number(this.resultData?.exerciseId);
+        if (!Number.isFinite(currentExerciseId) || currentExerciseId <= 0) {
+          this.$toast.info('Không xác định được bài tiếp theo, chuyển về danh sách bài tập.');
+          this.$router.push('/exercise');
+          return;
+        }
+
+        const fallbackNextId = currentExerciseId + 1;
+
+        // Kiểm tra nhanh bài tiếp theo có tồn tại trước khi điều hướng.
+        await getExercisesItems(fallbackNextId);
+        this.$router.push(`/exercise/${fallbackNextId}`);
+      } catch (e) {
+        this.$toast.info('Hiện chưa có bài tiếp theo, chuyển về danh sách bài tập.');
+        this.$router.push('/exercise');
+      } finally {
+        this.goingNext = false;
+      }
     }
   }
 };

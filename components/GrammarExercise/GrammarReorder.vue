@@ -85,7 +85,7 @@
         :class="orderedscrambled.length === 0 ? 'opacity-50 cursor-not-allowed' : ''"
         @click="resetOrder"
       >
-        🔄 Làm lại
+         Làm lại
       </button>
     </div>
 

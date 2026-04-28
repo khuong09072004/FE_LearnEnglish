@@ -244,13 +244,12 @@ import WriteReorder from "../../components/WritingExercise/WriteReorder.vue";
 import WriteRewrite from "../../components/WritingExercise/WriteRewrite.vue";
 import WriteFix from "../../components/WritingExercise/WriteFix.vue";
 import WriteReorderGroup from "../../components/WritingExercise/WriteReorderGroup.vue";
-
 import exerciseSoundMixin from "../../mixins/exerciseSoundMixin";
 import exerciseTimerMixin from "../../mixins/exerciseTimerMixin";
 import exerciseSubmitMixin from "../../mixins/exerciseSubmitMixin";
 
 export default {
-  layout: "pageLayout",
+  layout: "exerciseLayout",
   middleware: "auth",
 
   components: {
@@ -371,7 +370,7 @@ export default {
 
         
       } catch (error) {
-        console.error("❌ Error loading exercise:", error);
+        console.error(" Error loading exercise:", error);
         this.error = error.response?.data?.message || "Something went wrong";
         this.$toast.error("Failed to load exercise");
       } finally {
@@ -387,7 +386,7 @@ export default {
 
         
       } catch (error) {
-        console.error("❌ Error loading passage:", error);
+        console.error(" Error loading passage:", error);
       }
     },
 

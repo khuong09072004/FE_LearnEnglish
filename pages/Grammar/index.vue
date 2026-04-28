@@ -29,7 +29,7 @@
     </div>
 
     <div
-      class="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 lg:gap-6"
+      class=" mx-auto flex flex-col md:flex-row gap-4 lg:gap-6"
       style="height: calc(100vh - 40px)"
     >
       <!-- LEFT SIDEBAR - Grammar List -->

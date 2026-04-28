@@ -81,13 +81,13 @@
       <div v-if="flipped" class="flex justify-center gap-10 mt-12">
         <button
           @click="markAndNext(false)"
-          class="bg-red-500 hover:bg-red-600 text-white px-12 py-6 rounded-2xl text-2xl font-bold shadow-lg border-none outline-none ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-xl text-lg font-bold shadow-lg border-none outline-none ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
         >
           Chưa nhớ
         </button>
         <button
           @click="markAndNext(true)"
-          class="bg-green-500 hover:bg-green-600 text-white px-16 py-6 rounded-2xl text-2xl font-bold shadow-lg border-none outline-none ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-10 py-2 rounded-xl text-lg font-bold shadow-lg border-none outline-none ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
         >
           Đã nhớ
         </button>
@@ -131,7 +131,7 @@ import {
 } from "../../../apis/vocabularies";
 
 export default {
-  layout: "pageLayout",
+  layout: "exerciseLayout",
   middleware: "auth",
 
   data() {

@@ -133,6 +133,22 @@
         </div>
       </form>
     </a-modal>
+
+    <!-- Logout Confirmation Modal -->
+    <a-modal
+      v-model="showLogoutModal"
+      title="Xác nhận đăng xuất"
+      :width="400"
+      @ok="confirmLogout"
+      @cancel="showLogoutModal = false"
+      okText="Đăng xuất"
+      cancelText="Hủy"
+      okType="danger"
+    >
+      <p style="font-size: 1rem; color: #374151; margin: 16px 0;">
+        Bạn có chắc chắn muốn đăng xuất?
+      </p>
+    </a-modal>
   </div>
 </template>
 
@@ -158,6 +174,12 @@ export default {
     ProfileStats,
   },
   middleware: 'auth',
+
+  data() {
+    return {
+      showLogoutModal: false,
+    };
+  },
 
   setup() {
     const {
@@ -254,10 +276,12 @@ export default {
     },
 
     handleLogout() {
-      if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        this.$store.dispatch('auth/logout');
-        this.$router.push('/login');
-      }
+      this.showLogoutModal = true;
+    },
+
+    confirmLogout() {
+      this.$store.dispatch('auth/logout');
+      this.$router.push('/login');
     },
   },
 };

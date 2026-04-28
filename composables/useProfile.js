@@ -68,12 +68,12 @@ export const useProfile = () => {
           has_selected_level: user.value.has_selected_level,
         });
 
-        $message.success('✅ Cập nhật thông tin thành công!', 3);
+        $message.success(' Cập nhật thông tin thành công!', 3);
         editMode.value = false;
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật thông tin!';
-      $message.error('❌ ' + errorMsg, 3);
+      $message.error( + errorMsg, 3);
     } finally {
       loading.value = false;
     }

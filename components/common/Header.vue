@@ -26,7 +26,7 @@
 
       <!-- Tiêu đề trang -->
       <div class="title-star">
-        <a-icon type="star" theme="filled" class="star-icon" />
+        
         <div class="page-title">{{ pageTitleVi }}</div>
       </div>
     </div>
@@ -122,6 +122,9 @@ export default {
         exercise: "Bài Tập",
         files: "Tệp tin",
         games: "Trò chơi",
+        conversation: "Hội thoại",
+        chat:"Trò chuyện",
+        progress: "Tiến trình học tập",
       };
       return mapping[routeName] || "Trang";
     },
@@ -176,16 +179,15 @@ export default {
 .app-header {
   height: 60px;
   background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  /* border-bottom: 1px solid #e0e0e0; */
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
   gap: 20px;
-  border-radius: 18px;
+  border-radius: 18px 18px 0 0;
   box-shadow: 0 2px 6px #2553b91a;
 }
-
 .header-left {
   display: flex;
   align-items: center;
@@ -193,7 +195,6 @@ export default {
   flex: 1;
   min-width: 0;
 }
-
 .trigger {
   display: flex;
   cursor: pointer;
@@ -202,11 +203,9 @@ export default {
   transition: color 0.3s;
   flex-shrink: 0;
 }
-
 .trigger:hover {
   color: #1890ff;
 }
-
 .back-button {
   display: flex;
   cursor: pointer;
@@ -216,7 +215,6 @@ export default {
   opacity: 0.8;
   font-weight: 700;
 }
-
 .back-button .anticon {
   font-size: 14px;
 }
@@ -224,14 +222,12 @@ export default {
 .back-text {
   font-size: 14px;
 }
-
 .title-star {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
-
 .star-icon {
   font-size: 22px;
   flex-shrink: 0;

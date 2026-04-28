@@ -25,6 +25,7 @@
               class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
             ></span>
             Online
+            
           </div>
         </div>
       </div>

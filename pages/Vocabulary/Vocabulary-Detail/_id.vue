@@ -83,7 +83,7 @@ import {
 } from "@/apis/vocabularies";
 
 export default {
-  layout: "pageLayout",
+  layout: "exerciseLayout",
   middleware: "auth",
 
   data() {
