@@ -30,12 +30,12 @@ export const usePassword = () => {
       });
 
       if (response.status === 'success') {
-        $message.success('✅ Đổi mật khẩu thành công!', 3);
+        $message.success(' Đổi mật khẩu thành công!', 3);
         resetPasswordForm();
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu!';
-      $message.error('❌ ' + errorMsg, 3);
+      $message.error( + errorMsg, 3);
     } finally {
       loading.value = false;
     }

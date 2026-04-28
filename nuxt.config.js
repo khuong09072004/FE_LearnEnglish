@@ -38,7 +38,7 @@ export default {
   build: {
     transpile: [/unplugin-vue2-script-setup/],
 
-    // ✅ Thêm PostCSS plugin cho Tailwind
+
     postcss: {
       plugins: {
         tailwindcss: {},

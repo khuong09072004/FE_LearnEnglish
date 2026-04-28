@@ -36,15 +36,19 @@
         </div>
       </a-layout>
     </a-layout>
+
+    <!-- Chatbot Widget -->
+    <ChatBot />
   </div>
 </template>
 
 <script>
 import Header from "../components/common/Header.vue";
 import Sider from "../components/common/Slider.vue";
+import ChatBot from "../components/common/ChatBot.vue";
 
 export default {
-  components: { Header, Sider },
+  components: { Header, Sider, ChatBot },
   data() {
     return {
       collapsed: false,
@@ -150,33 +154,55 @@ export default {
 <style scoped>
 .app-container {
   padding: 20px;
-  background: #F0F5F9;
-  min-height: 100vh;
+  background: #ebf8ff;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-layout {
-  min-height: 100vh;
+  height: 100%;
   position: relative;
+  display: flex;
+  background: #ebf8ff;
+  overflow: hidden;
 }
 
 .content-layout {
   transition: margin-left 0.2s;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #ebf8ff;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .header-wrapper {
   padding-left: 20px;
+  flex-shrink: 0;
 }
 
 .content-wrapper {
   padding-left: 20px;
+  flex: 1;
+  overflow: hidden;  /* Bỏ scroll ở wrapper */
+  min-height: 0;
 }
 
 .main-content {
-  margin: 14px 0px 0 0px;
   padding: 24px;
   background: #fff;
-  min-height: 680px;
-  border-radius: 18px;
+  height: calc(100vh - 100px); /* Chiều cao cố định, chỉnh số 140px tùy ý */
+  border-radius: 0 0 18px 18px;
+  overflow-y: auto;             /* Scroll bên trong main-content */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE/Edge */
+}
+
+.main-content::-webkit-scrollbar {
+  display: none;                /* Chrome, Safari */
 }
 
 /* Sidebar Overlay cho mobile */

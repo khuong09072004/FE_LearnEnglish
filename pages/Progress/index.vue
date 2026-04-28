@@ -1,11 +1,9 @@
 <template>
   <div class="min-h-screen bg-white">
-    <div class="container mx-auto px-6 py-8 max-w-5xl">
+    <div class="container ">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">
-          Tiến trình học tập
-        </h1>
+        <h2 class="section-title">Tiến trình học của bạn</h2>
         <div class="flex items-center text-gray-600 text-sm">
           <span class="mr-2">📊</span>
           <span>Kết quả học</span>
@@ -241,6 +239,24 @@ export default {
 <style scoped>
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a5fa8;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 23px;
+  background: #4a90d9;
+  border-radius: 4px;
 }
 
 @keyframes spin {

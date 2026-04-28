@@ -160,8 +160,7 @@ export default {
           // Đếm số thông báo chưa đọc
           this.unreadCount = this.notifications.filter(n => !n.read).length;
           
-          console.log('✅ Đã tải thông báo:', this.notifications.length);
-          console.log('🔔 Chưa đọc:', this.unreadCount);
+          
         } else {
           console.error('❌ Response code không hợp lệ:', response.code);
         }
@@ -402,7 +401,6 @@ export default {
     console.log('🔔 NotificationDropdown mounted, isLoggedIn:', this.isLoggedIn);
 
     if (this.isLoggedIn) {
-      console.log('✅ User đã đăng nhập, bắt đầu load thông báo');
       this.fetchNotifications();
       this.setupWebSocket();
     } else {

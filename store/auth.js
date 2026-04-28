@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 
-const expiredTimeToken = 8; // 8 ngày
+const expiredTimeToken = 8;
 
 export default {
   namespaced: true,
@@ -24,7 +24,7 @@ export default {
     isLoggedIn: (state) => state.isLoggedIn,
     token: (state) => state.token,
     user: (state) => state.user,
-    userId: (state) => state.user?.id || null, // ✅ Thêm getter userId
+    userId: (state) => state.user?.id || null, 
     displayName: (state) => state.user?.name || "",
     avatar: (state) => state.user?.avatar || null,
     email: (state) => state.user?.email || "",
@@ -47,7 +47,7 @@ export default {
       const { token, name, email, avatar, has_selected_level, id,typeAccount } = payload;
 
       const user = { 
-        id, // ✅ Lưu id từ BE
+        id, 
         name, 
         email, 
         avatar, 

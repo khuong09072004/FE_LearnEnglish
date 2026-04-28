@@ -115,8 +115,22 @@ export default {
         const text = parts[label];
         const index = sentence.indexOf(text, currentPos);
         if (index !== -1) {
+          const labelToken = `(${label})`;
+          const markerStart = sentence.lastIndexOf(labelToken, index);
+
+          let start = index;
+          if (markerStart !== -1) {
+            const between = sentence.substring(
+              markerStart + labelToken.length,
+              index
+            );
+            if (/^\s*$/.test(between)) {
+              start = markerStart;
+            }
+          }
+
           positions.push({
-            start: index,
+            start,
             end: index + text.length,
             label: label,
             text: text,

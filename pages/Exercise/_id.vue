@@ -370,7 +370,7 @@ export default {
 
         
       } catch (error) {
-        console.error("❌ Error loading exercise:", error);
+        console.error(" Error loading exercise:", error);
         this.error = error.response?.data?.message || "Something went wrong";
         this.$toast.error("Failed to load exercise");
       } finally {
@@ -386,7 +386,7 @@ export default {
 
         
       } catch (error) {
-        console.error("❌ Error loading passage:", error);
+        console.error(" Error loading passage:", error);
       }
     },
 

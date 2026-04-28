@@ -90,8 +90,6 @@ class NotificationWebSocketService {
           {}, // BE không cần header Authorization, đã dùng token trong URL
           (frame) => {
             this.isConnected = true;
-            console.log('✅ Notification WebSocket Connected');
-            
             // Tự động subscribe vào kênh thông báo của user
             this.subscribeToNotifications();
             
