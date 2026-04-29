@@ -45,15 +45,15 @@
         @click.native="handleClick(item.key)"
       >
         <div class="nav-icon-wrap">
-          <component
-            :is="'svg'"
+          <svg
             v-html="item.icon"
             width="18"
             height="18"
             viewBox="0 0 24 24"
             fill="none"
+            xmlns="http://www.w3.org/2000/svg"
             class="nav-svg"
-          />
+          ></svg>
         </div>
         <transition name="fade">
           <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>

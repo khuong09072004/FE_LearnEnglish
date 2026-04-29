@@ -36,6 +36,7 @@
       <template v-if="isLoggedIn">
         <!-- Icon Thông báo -->
         <NotificationDropdown :isLoggedIn="isLoggedIn" />
+        
 
         <!-- Avatar -->
         <a-popover trigger="click" placement="bottomRight">
@@ -43,7 +44,7 @@
             <div class="user-popover">
               <!-- Thông tin user -->
               <div class="user-info">
-                <a-avatar :src="userAvatar" size="large" />
+                <a-avatar :src="userAvatar" size="large" class="border-2 border-solid border-blue-400" />
                 <div class="user-name">{{ user?.name }}</div>
                 <div class="user-email">{{ user?.email }}</div>
               </div>
@@ -251,6 +252,8 @@ export default {
 .user-avatar {
   cursor: pointer;
   transition: opacity 0.3s;
+  border: 2px solid #60a5fa; 
+
 }
 
 .user-avatar:hover {
@@ -283,6 +286,7 @@ export default {
   margin-top: 8px;
   font-weight: 600;
   color: #1f2937;
+  
 }
 
 .user-email {

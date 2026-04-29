@@ -1,7 +1,8 @@
 import axios from "axios";
 
-export function getConversationsByTopic(topicId) {
-  const url = `/conversations?TopicId=${topicId}`;
+
+export function getLessons() {
+  const url = `/conversations/lessons`;
   return new Promise((resolve, reject) => {
     axios
       .get(url)
@@ -9,12 +10,24 @@ export function getConversationsByTopic(topicId) {
       .catch((error) => reject(error));
   });
 }
-
-export function getConversationById(conversationId) {
-  const url = `/conversations/${conversationId}`;
+export function startConversation(lessonId) {
+  const userId = 5; // thay bằng userId thực từ store/auth của bạn
   return new Promise((resolve, reject) => {
     axios
-      .get(url)
+      .post(`/conversations/start?lessonId=${lessonId}&userId=${userId}`)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+
+export function replyConversation(sessionId, content) {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/conversations/${sessionId}/reply`, content, {
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      })
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
   });

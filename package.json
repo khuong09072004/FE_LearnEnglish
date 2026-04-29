@@ -19,6 +19,7 @@
     "axios": "^1.13.2",
     "howler": "^2.2.4",
     "js-cookie": "^3.0.5",
+    "lucide-vue": "^0.517.0",
     "nuxt": "^2.0.0",
     "socket.io-client": "^4.8.1",
     "vue-google-login": "^2.0.5",
