@@ -1,4 +1,33 @@
 import axios from "axios";
+import Cookies from "js-cookie";
+
+function getUserIdFromCookie() {
+  const userCookie = Cookies.get("user");
+
+  if (!userCookie) {
+    return null;
+  }
+
+  const tryParse = (value) => {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const decodedCookie = (() => {
+    try {
+      return decodeURIComponent(userCookie);
+    } catch (error) {
+      return userCookie;
+    }
+  })();
+
+  const user = tryParse(userCookie) || tryParse(decodedCookie);
+
+  return user?.id ?? null;
+}
 
 
 export function getLessons() {
@@ -11,7 +40,12 @@ export function getLessons() {
   });
 }
 export function startConversation(lessonId) {
-  const userId = 5; // thay bằng userId thực từ store/auth của bạn
+  const userId = getUserIdFromCookie();
+
+  if (!userId) {
+    return Promise.reject(new Error("Không tìm thấy userId trong cookie 'user'"));
+  }
+
   return new Promise((resolve, reject) => {
     axios
       .post(`/conversations/start?lessonId=${lessonId}&userId=${userId}`)
