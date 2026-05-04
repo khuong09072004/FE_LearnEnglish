@@ -22,15 +22,34 @@
           <div
             v-for="lesson in lessons"
             :key="lesson.id"
-            class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md hover:bg-gray-50 transition cursor-pointer"
+            class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 flex flex-col hover:shadow-md hover:bg-gray-50 transition cursor-pointer"
             :class="{
               'border-blue-400 bg-blue-50':
                 selectedLesson && selectedLesson.id === lesson.id,
+              'border-green-300 bg-green-50': lesson.is_learn,
             }"
             @click="startLesson(lesson)"
           >
-            <h3 class="font-semibold text-gray-800">{{ lesson.title }}</h3>
-            <a-icon type="right" class="text-gray-400" />
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-semibold text-gray-800 flex-1">{{ lesson.title }}</h3>
+              <a-icon type="right" class="text-gray-400" />
+            </div>
+            <div class="flex items-center gap-2">
+              <span
+                v-if="lesson.is_learn"
+                class="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full"
+              >
+                <a-icon type="check-circle" theme="filled" />
+                Đã học
+              </span>
+              <span
+                v-else
+                class="inline-flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-100 px-2.5 py-0.5 rounded-full"
+              >
+                <a-icon type="book" theme="filled" />
+                Chưa học
+              </span>
+            </div>
           </div>
 
           <div
@@ -67,10 +86,21 @@
             <div
               class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white"
             >
-              <h2 class="text-lg font-bold">{{ selectedLesson.title }}</h2>
-              <p class="text-blue-100 text-sm">
-                {{ selectedLesson.description }}
-              </p>
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <h2 class="text-lg font-bold">{{ selectedLesson.title }}</h2>
+                  <p class="text-blue-100 text-sm">
+                    {{ selectedLesson.description }}
+                  </p>
+                </div>
+                <div
+                  v-if="selectedLesson.is_learn"
+                  class="inline-flex items-center gap-1.5 text-sm font-medium bg-green-500 bg-opacity-80 px-3 py-1.5 rounded-lg ml-3 whitespace-nowrap"
+                >
+                  <a-icon type="check-circle" theme="filled" />
+                  Đã học
+                </div>
+              </div>
             </div>
 
             <!-- Messages -->
@@ -173,6 +203,7 @@ import {
   getLessons,
   startConversation,
   replyConversation,
+  getLearnedHistory,
 } from "~/apis/conversation";
 
 export default {
@@ -220,17 +251,42 @@ export default {
       this.starting = true;
 
       try {
-        const response = await startConversation(lesson.id);
-        if (response.status === "success" && response.data) {
-          this.sessionId = response.data.sessionId;
-          this.messages.push({
-            role: "AI",
-            content: response.data.content,
-          });
-          this.scrollToBottom();
+        if (lesson.is_learn) {
+          // Nếu đã học, hiển thị lịch sử học
+          const response = await getLearnedHistory(lesson.id);
+          if (response.status === "success" && response.data) {
+            // response.data chứa turns array
+            const turns = response.data.turns || [];
+            if (Array.isArray(turns) && turns.length > 0) {
+              this.messages = turns.map((msg) => ({
+                role: msg.role,
+                content: msg.content,
+                analysis: msg.analysis,
+                correction: msg.correction,
+                score: msg.score,
+              }));
+            } else {
+              this.messages = [{
+                role: "AI",
+                content: "Chưa có lịch sử học tập cho bài này",
+              }];
+            }
+            this.scrollToBottom();
+          }
+        } else {
+          // Nếu chưa học, bắt đầu cuộc hội thoại mới
+          const response = await startConversation(lesson.id);
+          if (response.status === "success" && response.data) {
+            this.sessionId = response.data.sessionId;
+            this.messages.push({
+              role: "AI",
+              content: response.data.content,
+            });
+            this.scrollToBottom();
+          }
         }
       } catch (error) {
-        this.$message.error("Không thể bắt đầu bài hội thoại");
+        this.$message.error("Không thể tải bài hội thoại");
       } finally {
         this.starting = false;
       }
