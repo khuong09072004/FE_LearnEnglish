@@ -124,6 +124,7 @@ export default {
         files: "Tệp tin",
         games: "Trò chơi",
         conversation: "Hội thoại",
+        contact: "Liên hệ",
         chat:"Trò chuyện",
         progress: "Tiến trình học tập",
       };

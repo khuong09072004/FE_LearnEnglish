@@ -116,11 +116,18 @@ export default {
           label: "Hội Thoại",
           icon: `<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>`,
         },
+        
         {
           key: "6",
           path: "/chat",
           label: "Chat",
           icon: `<path d="M8 12h.01M12 12h.01M16 12h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M20 12c0 4.418-3.582 8-8 8a8.96 8.96 0 01-4-.94L3 21l1.06-4.5A8 8 0 1120 12z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>`,
+        },
+        {
+          key: "7",
+          path: "/contact",
+          label: "Liên Hệ",
+          icon: `<path d="M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 8l9 6 9-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`,
         },
       ],
     };

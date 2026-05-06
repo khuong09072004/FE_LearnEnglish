@@ -131,8 +131,9 @@ export default {
         '/grammar': '3',
         '/exercise': '4',
         '/conversation': '5',
-        '/chat': '6',
-        '/games': '7'
+        '/contact': '6',
+        '/chat': '7',
+        '/games': '8'
       };
       
       // Tìm key tương ứng với route hiện tại
