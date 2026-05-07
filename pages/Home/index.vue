@@ -68,9 +68,9 @@ export default {
         },
         {
           id: 4,
-          icon: '🎙️',
-          title: 'Luyện nói',
-          description: 'Phát âm chuẩn hơn với các bài luyện nói cùng AI.',
+          icon: '✍️',
+          title: 'Luyện viết với AI',
+          description: 'Cải thiện ngữ pháp với các bài luyện viết cùng AI.',
           to: '/conversation',
         },
         {

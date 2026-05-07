@@ -125,15 +125,20 @@ export default {
     updateSelectedKeys() {
       // Map route path to menu key
       const path = this.$route.path.toLowerCase();
+      if (path.startsWith('/about')) {
+        this.selectedKeys = ['7'];
+        return;
+      }
+
       const routeMap = {
         '/home': '1',
         '/vocabulary': '2',
         '/grammar': '3',
         '/exercise': '4',
         '/conversation': '5',
-        '/contact': '6',
-        '/chat': '7',
-        '/games': '8'
+        '/chat': '6',
+        '/about': '7',
+        '/contact': '8'
       };
       
       // Tìm key tương ứng với route hiện tại

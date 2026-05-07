@@ -1,12 +1,13 @@
 <template>
-  <a-popover 
-    v-model="visible"
-    trigger="click" 
-    placement="bottomRight"
-    overlayClassName="notification-popover"
-  >
-    <template #content>
-      <div class="notification-dropdown">
+  <div class="notification-wrapper">
+    <a-popover 
+      v-model="visible"
+      trigger="click" 
+      placement="bottomRight"
+      overlayClassName="notification-popover"
+    >
+      <template #content>
+        <div class="notification-dropdown">
         <!-- Header của dropdown -->
         <div class="notification-header">
           <h4>Thông báo</h4>
@@ -87,18 +88,45 @@
             @change="handlePageChange"
           />
         </div>
-      </div>
-    </template>
+        </div>
+      </template>
 
-    <!-- Badge với số lượng thông báo chưa đọc -->
-    <a-badge :count="unreadCount" :overflow-count="99">
-      <a-icon 
-        type="bell" 
-        class="notification-icon"
-        :class="{ 'has-notification': unreadCount > 0 }"
-      />
-    </a-badge>
-  </a-popover>
+      <!-- Badge với số lượng thông báo chưa đọc -->
+      <a-badge :count="unreadCount" :overflow-count="99">
+        <a-icon 
+          type="bell" 
+          class="notification-icon"
+          :class="{ 'has-notification': unreadCount > 0 }"
+        />
+      </a-badge>
+    </a-popover>
+
+    <a-modal
+      :visible="showLevelUpModal"
+      :footer="null"
+      centered
+      :width="460"
+      :maskClosable="false"
+      :closable="true"
+      @cancel="closeLevelUpModal"
+    >
+      <div class="level-up-modal">
+        <div class="level-up-badge">🎉</div>
+        <h3 class="level-up-title">Bạn đã lên level</h3>
+        <p class="level-up-message">
+          {{ levelUpMessage }}
+        </p>
+        <div class="level-up-actions">
+          <a-button @click="closeLevelUpModal">
+            Để sau
+          </a-button>
+          <a-button type="primary" @click="goToChangeLevel">
+            Chọn level tiếp theo
+          </a-button>
+        </div>
+      </div>
+    </a-modal>
+  </div>
 </template>
 
 <script>
@@ -125,6 +153,9 @@ export default {
       unreadCount: 0,
       wsConnected: false,
       notificationInterval: null,
+      showLevelUpModal: false,
+      levelUpNotification: null,
+      levelUpMessage: 'Vui lòng chọn level tiếp theo để tiếp tục hành trình học tập của bạn.',
     };
   },
   watch: {
@@ -160,7 +191,6 @@ export default {
           // Đếm số thông báo chưa đọc
           this.unreadCount = this.notifications.filter(n => !n.read).length;
           
-          
         } else {
           console.error('❌ Response code không hợp lệ:', response.code);
         }
@@ -183,6 +213,12 @@ export default {
         }
       }
       
+      if (this.isLevelUpNotification(notification)) {
+        this.openLevelUpModal(notification);
+        this.visible = false;
+        return;
+      }
+
       // Xử lý action từ data field
       if (notification.data) {
         try {
@@ -198,7 +234,7 @@ export default {
               // Giữ nguyên popup, không điều hướng
               break;
             case 'OPEN_LEVEL_RESULT':
-              this.$router.push(`/progress`);
+              this.$router.push('/Change-Level');
               break;
             case 'OPEN_EXERCISE':
               if (data.exerciseId) {
@@ -366,23 +402,81 @@ export default {
         this.unreadCount++;
       }
       
-      // Hiển thị notification toast với icon
-      const icon = this.getNotificationIcon(notification.type);
-      this.$notification.info({
-        message: `${icon} ${notification.title || 'Thông báo mới'}`,
-        description: notification.content,
-        duration: 4,
-        placement: 'topRight',
-        onClick: () => {
-          this.handleNotificationClick(notification);
-          this.$notification.close(notification.id);
-        }
-      });
+      if (this.isLevelUpNotification(notification)) {
+        this.openLevelUpModal(notification);
+      } else {
+        // Hiển thị notification toast với icon
+        const icon = this.getNotificationIcon(notification.type);
+        this.$notification.info({
+          message: `${icon} ${notification.title || 'Thông báo mới'}`,
+          description: notification.content,
+          duration: 4,
+          placement: 'topRight',
+          onClick: () => {
+            this.handleNotificationClick(notification);
+            this.$notification.close(notification.id);
+          }
+        });
+      }
       
       // Giới hạn số lượng notification trong danh sách
       if (this.notifications.length > this.pageSize) {
         this.notifications.pop();
       }
+    },
+    isLevelUpNotification(notification) {
+      if (!notification) {
+        return false;
+      }
+
+      if (notification.type === 'LEVEL_COMPLETED') {
+        return true;
+      }
+
+      if (!notification.data) {
+        return false;
+      }
+
+      try {
+        const data = JSON.parse(notification.data);
+        return ['OPEN_LEVEL_RESULT', 'OPEN_LEVEL_CHANGE'].includes(data.action);
+      } catch (error) {
+        return false;
+      }
+    },
+    openLevelUpModal(notification) {
+      if (!notification) {
+        return;
+      }
+
+      if (notification.read) {
+        return;
+      }
+
+      this.levelUpNotification = notification;
+      this.levelUpMessage = notification?.content || 'Vui lòng chọn level tiếp theo để tiếp tục hành trình học tập của bạn.';
+      this.showLevelUpModal = true;
+    },
+    closeLevelUpModal() {
+      this.showLevelUpModal = false;
+      this.levelUpNotification = null;
+    },
+    async goToChangeLevel() {
+      const notification = this.levelUpNotification;
+
+      if (notification && !notification.read) {
+        try {
+          await markAsRead(notification.id);
+          notification.read = true;
+          this.unreadCount = Math.max(0, this.unreadCount - 1);
+        } catch (error) {
+          console.error('Lỗi khi đánh dấu thông báo level-up đã đọc:', error);
+        }
+      }
+
+      this.closeLevelUpModal();
+      this.visible = false;
+      this.$router.push('/Change-Level');
     },
     cleanup() {
       if (this.notificationInterval) {
@@ -451,6 +545,43 @@ export default {
   max-height: 500px;
   display: flex;
   flex-direction: column;
+}
+
+.level-up-modal {
+  text-align: center;
+  padding: 8px 4px 4px;
+}
+
+.level-up-badge {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.level-up-title {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.level-up-message {
+  margin: 0 0 20px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.level-up-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .notification-header {

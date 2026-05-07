@@ -5,7 +5,7 @@
     <div class="container mx-auto px-4 py-6 max-w-7xl">
       <!-- Header -->
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">💬 Hội thoại</h1>
+        <h1 class="text-3xl font-bold text-blue-700"> Hội thoại</h1>
         <p class="text-gray-600 mt-2">
           Học tiếng Anh qua các cuộc trò chuyện mẫu cùng với AI
         </p>

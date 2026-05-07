@@ -1,7 +1,7 @@
 <template>
   <div class="contact-page">
     <div class="contact-header">
-      <h1>Liên hệ với chúng tôi</h1>
+      <h1 class="text-blue-700" >Liên hệ với chúng tôi</h1>
       <p>Chúng tôi luôn sẵn sàng hỗ trợ và giải đáp mọi thắc mắc của bạn.</p>
     </div>
 
@@ -173,7 +173,7 @@ export default {
 
 .contact-header h1 {
   margin: 0;
-  color: #1d4f99;
+
   font-size: 34px;
   font-weight: 800;
   line-height: 1.2;

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-white">
-    <div class="container ">
+    <div class="container">
       <!-- Header -->
       <div class="mb-8">
         <h2 class="section-title">Tiến trình học của bạn</h2>
@@ -17,6 +17,7 @@
 
       <!-- Content -->
       <div v-else-if="progressData" class="space-y-6">
+
         <!-- Progress Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Vocabulary Card -->
@@ -29,7 +30,10 @@
                   Học từ vựng mới
                 </div>
               </div>
-              <button @click="goToVocabulary" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition">
+              <button
+                @click="goToVocabulary"
+                class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition"
+              >
                 <a-icon type="right" />
               </button>
             </div>
@@ -37,14 +41,17 @@
               <div class="flex justify-between items-center mb-2">
                 <span class="text-sm text-gray-600">Tiến độ</span>
                 <span class="text-sm font-semibold text-gray-800">
-                  {{ progressData.learnedVocabulary }}/{{ progressData.totalVocabulary }} 
+                  {{ progressData.learnedVocabulary }}/{{ progressData.totalVocabulary }}
                 </span>
               </div>
               <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden border border-gray-300">
                 <div
                   class="bg-gradient-to-r from-blue-400 to-blue-500 h-3 rounded-full transition-all duration-500"
-                  :style="{ width: vocabularyPercent + '%' }"
+                  :style="{ width: progressData.vocabularyPercentage + '%' }"
                 ></div>
+              </div>
+              <div class="text-right text-xs text-blue-600 font-semibold mt-1">
+                {{ Math.round(progressData.vocabularyPercentage) }}%
               </div>
             </div>
           </div>
@@ -59,7 +66,10 @@
                   Làm bài tập nhé!
                 </div>
               </div>
-              <button @click="goToExercise" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition">
+              <button
+                @click="goToExercise"
+                class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition"
+              >
                 <a-icon type="right" />
               </button>
             </div>
@@ -67,50 +77,118 @@
               <div class="flex justify-between items-center mb-2">
                 <span class="text-sm text-gray-600">Tiến độ</span>
                 <span class="text-sm font-semibold text-gray-800">
-                  {{ progressData.completedExercises }}/{{ progressData.totalExercises }} 
+                  {{ progressData.completedExercises }}/{{ progressData.totalExercises }}
                 </span>
               </div>
               <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden border border-gray-300">
                 <div
                   class="bg-gradient-to-r from-blue-400 to-blue-500 h-3 rounded-full transition-all duration-500"
-                  :style="{ width: exercisePercent + '%' }"
+                  :style="{ width: progressData.exercisePercentage + '%' }"
                 ></div>
+              </div>
+              <div class="text-right text-xs text-blue-600 font-semibold mt-1">
+                {{ Math.round(progressData.exercisePercentage) }}%
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Study Time Chart -->
+        <!-- Study Time Chart (7 ngày thực từ API) -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center mb-6">
-            <span class="mr-2">⏰</span>
-            <h3 class="text-gray-800 font-semibold">Thời gian học</h3>
-          </div>
-          
-          <!-- Chart Area -->
-          <div class="mt-6">
-            <div class="flex items-end justify-between h-48 space-x-2">
-              <div
-                v-for="day in weekDays"
-                :key="day.label"
-                class="flex-1 flex flex-col items-center"
-              >
-                <div class="w-full bg-gray-100 rounded-t-lg relative flex-1 flex items-end">
-                  <div
-                    class="w-full bg-blue-400 rounded-t-lg transition-all duration-500 hover:bg-blue-500"
-                    :style="{ height: day.height + '%' }"
-                  ></div>
-                </div>
-                <div class="text-xs text-gray-500 mt-2 text-center">{{ day.label }}</div>
-              </div>
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+              <span class="mr-2">⏰</span>
+              <h3 class="text-gray-800 font-semibold">Thời gian học trong 7 ngày qua</h3>
             </div>
+            <span class="text-xs text-gray-400">{{ chartDateRange }}</span>
           </div>
 
-          <!-- Total Study Time -->
-          <div class="mt-8 pt-6 border-t border-gray-200">
-            <div class="flex items-center justify-between">
-              <span class="text-gray-600">Tổng thời gian học trong tuần</span>
-              <span class="text-2xl font-bold text-blue-600">{{ formatStudyTime }} phút</span>
+<!-- Chart Area -->
+<div class="mt-6">
+  <div class="flex items-end justify-between space-x-2" style="height: 180px;">
+    <div
+      v-for="day in chartDays"
+      :key="day.date"
+      class="flex-1 flex flex-col items-center group relative h-full"
+    >
+      <!-- Cột wrapper chiếm full height, bar mọc từ dưới lên -->
+      <div class="w-full flex-1 relative flex items-end rounded-t-lg overflow-visible bg-gray-100">
+        <div
+          class="w-full rounded-t-lg transition-all duration-700"
+          :class="day.isToday ? 'bg-blue-500 hover:bg-blue-600' : 'bg-blue-200 hover:bg-blue-300'"
+          :style="{ height: (day.height > 0 ? day.height : 2) + '%' }"
+        ></div>
+        <!-- Tooltip -->
+        <div
+          class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center bg-gray-800 text-white text-xs px-2 py-1.5 rounded whitespace-nowrap z-10 gap-0.5"
+        >
+          <span>⏱ {{ day.minutesSpent }} phút</span>
+          <span>📖 {{ day.vocabsLearned }} từ</span>
+          <span>✅ {{ day.exercisesPassed }} bài</span>
+        </div>
+      </div>
+
+      <!-- Label -->
+      <div
+        class="text-xs mt-2 text-center font-medium"
+        :class="day.isToday ? 'text-blue-600' : 'text-gray-500'"
+      >
+        {{ day.label }}
+      </div>
+      <div v-if="day.isToday" class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1"></div>
+    </div>
+  </div>
+</div>
+
+          <!-- Footer stats -->
+          <div class="mt-8 pt-6 border-t border-gray-200 grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div class="text-sm text-gray-500 mb-1">Tổng phút học</div>
+              <div class="text-2xl font-bold text-blue-600">{{ totalMinutesWeek }}</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500 mb-1">Từ vựng học được</div>
+              <div class="text-2xl font-bold text-blue-600">{{ totalVocabsWeek }}</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-500 mb-1">Bài tập hoàn thành</div>
+              <div class="text-2xl font-bold text-blue-600">{{ totalExercisesWeek }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Topic Breakdown -->
+        <div
+          v-if="progressData.topicBreakdown && progressData.topicBreakdown.length"
+          class="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+        >
+          <div class="flex items-center mb-6">
+            <span class="mr-2">🎯</span>
+            <h3 class="text-gray-800 font-semibold">Tiến độ theo chủ đề</h3>
+          </div>
+          <div class="space-y-4">
+            <div
+              v-for="topic in progressData.topicBreakdown"
+              :key="topic.topicId"
+              class="border border-gray-100 rounded-lg p-4 hover:border-blue-200 hover:shadow-sm transition"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <h4 class="font-semibold text-gray-800">{{ topic.topicName }}</h4>
+                  <div class="text-xs text-gray-500 mt-0.5">
+                    {{ topic.learnedVocabulary }}/{{ topic.totalVocabulary }} từ vựng
+                  </div>
+                </div>
+                <div class="text-2xl font-bold text-blue-600">
+                  {{ Math.round(topic.learnedPercentage) }}%
+                </div>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div
+                  class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-500"
+                  :style="{ width: topic.learnedPercentage + '%' }"
+                ></div>
+              </div>
             </div>
           </div>
         </div>
@@ -119,23 +197,23 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
             <div class="text-sm text-blue-100 mb-1">Từ vựng đã học</div>
-            <div class="text-3xl font-bold">
-              {{ progressData.learnedVocabulary }}
-            </div>
+            <div class="text-3xl font-bold">{{ progressData.learnedVocabulary }}</div>
+            <div class="text-xs text-blue-200 mt-1">/ {{ progressData.totalVocabulary }} từ</div>
           </div>
           <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
-            <div class="text-sm text-blue-100 mb-1">Bài tập hoàn thành</div>
-            <div class="text-3xl font-bold">
-              {{ progressData.completedExercises }}
-            </div>
+            <div class="text-sm text-green-100 mb-1">Bài tập hoàn thành</div>
+            <div class="text-3xl font-bold">{{ progressData.completedExercises }}</div>
+            <div class="text-xs text-green-200 mt-1">/ {{ progressData.totalExercises }} bài</div>
           </div>
           <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
-            <div class="text-sm text-blue-100 mb-1">Tổng thời gian học</div>
+            <div class="text-sm text-purple-100 mb-1">Tổng thời gian học</div>
             <div class="text-3xl font-bold">
-              {{ formatStudyTime }}<span class="text-lg ml-1">phút</span>
+              {{ progressData.totalStudyMinutes || 0 }}
+              <span class="text-lg ml-1">phút</span>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- Error State -->
@@ -153,7 +231,7 @@
 </template>
 
 <script>
-import { trackLearningProgress } from '~/apis/level';
+import { getLevelProgressDetail } from '~/apis/level';
 
 export default {
   name: 'ProgressPage',
@@ -161,55 +239,40 @@ export default {
   data() {
     return {
       progressData: null,
+      chartDays: [],
       loading: true,
       error: null,
-      weekDays: [
-        { label: 'T2', height: 0 },
-        { label: 'T3', height: 0 },
-        { label: 'T4', height: 0 },
-        { label: 'T5', height: 0 },
-        { label: 'T6', height: 0 },
-        { label: 'T7', height: 0 },
-        { label: 'CN', height: 0 },
-      ],
     };
   },
   computed: {
-    vocabularyPercent() {
-      if (!this.progressData || this.progressData.totalVocabulary === 0) {
-        return 0;
-      }
-      return Math.round(
-        (this.progressData.learnedVocabulary / this.progressData.totalVocabulary) * 100
-      );
+    totalMinutesWeek() {
+      return this.chartDays.reduce((sum, d) => sum + (d.minutesSpent || 0), 0);
     },
-    exercisePercent() {
-      if (!this.progressData || this.progressData.totalExercises === 0) {
-        return 0;
-      }
-      return Math.round(
-        (this.progressData.completedExercises / this.progressData.totalExercises) * 100
-      );
+    totalVocabsWeek() {
+      return this.chartDays.reduce((sum, d) => sum + (d.vocabsLearned || 0), 0);
     },
-    formatStudyTime() {
-      if (!this.progressData) return 0;
-      return this.progressData.totalStudyMinutes || 0;
+    totalExercisesWeek() {
+      return this.chartDays.reduce((sum, d) => sum + (d.exercisesPassed || 0), 0);
+    },
+    chartDateRange() {
+      if (!this.chartDays.length) return '';
+      return `${this.chartDays[0].date} → ${this.chartDays[this.chartDays.length - 1].date}`;
     },
   },
   mounted() {
     this.fetchProgress();
-    this.generateChartData();
   },
   methods: {
     async fetchProgress() {
       this.loading = true;
       this.error = null;
       try {
-        const response = await trackLearningProgress();
-        if (response.status === 'success') {
+        const response = await getLevelProgressDetail();
+        if (response?.status === 'success') {
           this.progressData = response.data;
+          this.buildChartDays(response.data.studyHistoryLast7Days || []);
         } else {
-          this.error = response.message || 'Không thể tải dữ liệu';
+          this.error = response?.message || 'Không thể tải dữ liệu';
         }
       } catch (err) {
         console.error('Error fetching progress:', err);
@@ -218,14 +281,32 @@ export default {
         this.loading = false;
       }
     },
-    generateChartData() {
-      // Generate random chart data for demonstration
-      // In real app, this should come from API
-      this.weekDays = this.weekDays.map((day) => ({
-        ...day,
-        height: Math.random() * 80 + 10, // Random height between 10-90%
-      }));
-    },
+
+    buildChartDays(history) {
+  const today = new Date().toISOString().slice(0, 10);
+  const maxMinutes = Math.max(...history.map(d => d.minutesSpent || 0), 1);
+
+  this.chartDays = history.map(item => {
+    const dateObj = new Date(item.date);
+    const jsDay = dateObj.getDay();
+    const labelMap = { 0: 'CN', 1: 'T2', 2: 'T3', 3: 'T4', 4: 'T5', 5: 'T6', 6: 'T7' };
+
+    // Nếu có data thì tối thiểu 20%, không có thì 0
+    const rawHeight = Math.round((item.minutesSpent / maxMinutes) * 100);
+    const height = item.minutesSpent > 0 ? Math.max(20, rawHeight) : 0;
+
+    return {
+      date: item.date,
+      label: labelMap[jsDay],
+      isToday: item.date === today,
+      height,
+      minutesSpent: item.minutesSpent || 0,
+      vocabsLearned: item.vocabsLearned || 0,
+      exercisesPassed: item.exercisesPassed || 0,
+    };
+  });
+},
+
     goToVocabulary() {
       this.$router.push('/Vocabulary');
     },
@@ -240,6 +321,7 @@ export default {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
 .section-title {
   font-size: 24px;
   font-weight: 700;
@@ -260,11 +342,11 @@ export default {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .section-title { font-size: 20px; }
 }
 </style>

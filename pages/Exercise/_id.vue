@@ -285,6 +285,9 @@ export default {
       currentQuestionIndex: 0,
       userAnswers: {},
       showConfirmModal: false,
+      isConfirmedExit: false,
+      pendingRoute: null,
+      routeGuardNext: null,
     };
   },
 
@@ -349,6 +352,27 @@ export default {
   beforeDestroy() {
     this.clearTimer();
     this.destroySounds();
+  },
+
+  beforeRouteLeave(to, from, next) {
+    // Nếu đã confirm exit hoặc đang submit bài, cho phép đi
+    if (this.isConfirmedExit || this.isSubmitting) {
+      next();
+      return;
+    }
+
+    const hasAnswers = Object.keys(this.userAnswers).length > 0;
+
+    if (hasAnswers) {
+      // Lưu route và next callback, hiện modal xác nhận
+      this.pendingRoute = to;
+      this.routeGuardNext = next;
+      this.showConfirmModal = true;
+      // Prevent navigation tạm thời
+      next(false);
+    } else {
+      next();
+    }
   },
 
   methods: {
@@ -433,7 +457,17 @@ export default {
 
     confirmExit() {
       this.closeConfirmModal();
-      this.goBackNow();
+      this.isConfirmedExit = true;
+      
+      // Nếu có pending route (từ route guard), navigate đến đó
+      if (this.pendingRoute && this.routeGuardNext) {
+        this.routeGuardNext();
+        this.pendingRoute = null;
+        this.routeGuardNext = null;
+      } else {
+        // Nếu không, gọi goBackNow (từ nút quay lại truyền thống)
+        this.goBackNow();
+      }
     },
 
     goBackNow() {

@@ -31,44 +31,79 @@
       </div>
     </div>
 
-    <!-- Footer user -->
-      <div v-if="!collapsed" class="section-label">Chức năng</div>
+    <div class="sidebar-scroll">
+      <section class="menu-section">
+        <div v-if="!collapsed" class="section-label">Chức năng</div>
 
-    <!-- Menu -->
-    <nav class="nav-menu">
-      <nuxt-link
-        v-for="item in menuItems"
-        :key="item.key"
-        :to="item.path"
-        class="nav-item"
-        :class="{ active: localSelectedKeys.includes(item.key) }"
-        @click.native="handleClick(item.key)"
-      >
-        <div class="nav-icon-wrap">
-          <svg
-            v-html="item.icon"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            class="nav-svg"
-          ></svg>
-        </div>
-        <transition name="fade">
-          <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>
-        </transition>
-        <transition name="fade">
-          <div
-            v-if="!collapsed && localSelectedKeys.includes(item.key)"
-            class="active-dot"
-          ></div>
-        </transition>
-      </nuxt-link>
-    </nav>
+        <nav class="nav-menu">
+          <nuxt-link
+            v-for="item in mainMenuItems"
+            :key="item.key"
+            :to="item.path"
+            class="nav-item"
+            :class="{ active: localSelectedKeys.includes(item.key) }"
+            @click.native="handleClick(item.key)"
+          >
+            <div class="nav-icon-wrap">
+              <svg
+                v-html="item.icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="nav-svg"
+              ></svg>
+            </div>
+            <transition name="fade">
+              <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>
+            </transition>
+            <transition name="fade">
+              <div
+                v-if="!collapsed && localSelectedKeys.includes(item.key)"
+                class="active-dot"
+              ></div>
+            </transition>
+          </nuxt-link>
+        </nav>
+      </section>
 
+      <section class="menu-section learn-more">
+        <div v-if="!collapsed" class="section-label">Tìm hiểu thêm</div>
 
-    <!-- Footer user -->
+        <nav class="nav-menu secondary-menu">
+          <nuxt-link
+            v-for="item in moreMenuItems"
+            :key="item.key"
+            :to="item.path"
+            class="nav-item"
+            :class="{ active: localSelectedKeys.includes(item.key) }"
+            @click.native="handleClick(item.key)"
+          >
+            <div class="nav-icon-wrap">
+              <svg
+                v-html="item.icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="nav-svg"
+              ></svg>
+            </div>
+            <transition name="fade">
+              <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>
+            </transition>
+            <transition name="fade">
+              <div
+                v-if="!collapsed && localSelectedKeys.includes(item.key)"
+                class="active-dot"
+              ></div>
+            </transition>
+          </nuxt-link>
+        </nav>
+      </section>
+    </div>
   </a-layout-sider>
 </template>
 
@@ -85,7 +120,7 @@ export default {
     return {
       localSelectedKeys: this.selectedKeys,
       accountName: "Tài khoản",
-      menuItems: [
+      mainMenuItems: [
         {
           key: "1",
           path: "/home",
@@ -123,8 +158,16 @@ export default {
           label: "Chat",
           icon: `<path d="M8 12h.01M12 12h.01M16 12h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M20 12c0 4.418-3.582 8-8 8a8.96 8.96 0 01-4-.94L3 21l1.06-4.5A8 8 0 1120 12z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>`,
         },
+      ],
+      moreMenuItems: [
         {
           key: "7",
+          path: "/about",
+          label: "Giới Thiệu",
+          icon: `<path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>`,
+        },
+        {
+          key: "8",
           path: "/contact",
           label: "Liên Hệ",
           icon: `<path d="M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 8l9 6 9-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`,
@@ -211,7 +254,7 @@ export default {
 }
 .logo-text {
   display: flex;
-  font-weight: 700;
+  font-weight: bold;
   font-size: 20px;
   color: #0a7ea4;
 }
@@ -234,9 +277,32 @@ export default {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.4px;
-  color: rgba(10, 61, 82, 0.45);
-  padding: 0 20px 6px;
+  color: rgba(10, 61, 82, 0.6);
+  padding: 0 18px 8px;
   flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.sidebar-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 10px 14px;
+}
+
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+.learn-more {
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 /* ===== Nav ===== */
@@ -244,8 +310,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 0 10px;
-  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -268,13 +332,16 @@ export default {
   position: relative;
   overflow: hidden;
   color: #0a3d52;
+  border: 1px solid transparent;
 }
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.46);
   color: #0a3d52;
+  transform: translateX(2px);
 }
 .nav-item.active {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(255, 255, 255, 0.65);
   box-shadow: 0 2px 12px rgba(10, 61, 82, 0.1);
   color: #0a7ea4;
 }
@@ -289,16 +356,18 @@ export default {
   justify-content: center;
   background: rgba(255, 255, 255, 0.38);
   transition: background 0.18s;
+  color: #0a3d52;
 }
 .nav-item.active .nav-icon-wrap {
   background: #e0f7fc;
+  color: #0a7ea4;
 }
 .nav-svg {
-  stroke: #fa0000;
+  stroke: currentColor;
   transition: stroke 0.18s;
 }
 .nav-item.active .nav-svg {
-  stroke: #f8fdff;
+  stroke: currentColor;
 }
 
 .nav-label {
@@ -312,6 +381,10 @@ export default {
 .nav-item.active .nav-label {
   font-weight: 500;
   color: #0a7ea4;
+}
+
+.secondary-menu .nav-item:not(.active) {
+  background: transparent;
 }
 
 .active-dot {
@@ -432,6 +505,10 @@ export default {
   opacity: 1;
 }
 
+.mobile-sider .sidebar-scroll {
+  padding-bottom: 18px;
+}
+
 /* ===== Tablet ===== */
 @media (max-width: 1023px) and (min-width: 768px) {
   .custom-sider {
@@ -449,6 +526,10 @@ export default {
     width: 36px;
     height: 36px;
     min-width: 36px;
+  }
+
+  .sidebar-scroll {
+    padding: 0 14px 16px;
   }
 }
 </style>

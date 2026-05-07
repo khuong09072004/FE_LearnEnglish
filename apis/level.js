@@ -47,3 +47,43 @@ export function selectLevel(code) {
       .catch((error) => reject(error));
   });
 }
+
+export function getTopicProgress(topicId) {
+  const url = `/users/Tracking/topic/${topicId}`;
+  return new Promise((resolve, reject) => {
+    axios
+      .get(url)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+
+export function getLevelProgressHistory(startDate, endDate, granularity) {
+  let url = "/users/Tracking/level/history";
+  const params = [];
+  
+  if (startDate) params.push(`startDate=${startDate}`);
+  if (endDate) params.push(`endDate=${endDate}`);
+  if (granularity) params.push(`granularity=${granularity}`);
+  
+  if (params.length > 0) {
+    url += "?" + params.join("&");
+  }
+  
+  return new Promise((resolve, reject) => {
+    axios
+      .get(url)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+
+export function getLevelProgressDetail() {
+  const url = "/users/Tracking/level/detail";
+  return new Promise((resolve, reject) => {
+    axios
+      .get(url)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}

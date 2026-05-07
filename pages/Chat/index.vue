@@ -21,8 +21,7 @@
       <!-- Header -->
       <div class="mb-6 flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold flex items-center gap-3">
-            <span class="text-4xl">💬</span>
+          <h1 class="text-3xl font-bold flex items-center text-blue-700 gap-3">
             Chat Room
             <span
               class="w-3 h-3 rounded-full animate-pulse"

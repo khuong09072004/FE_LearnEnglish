@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-white px-4 py-6">
-    <h1 class="text-2xl font-semibold mb-6 text-gray-800">
-      Danh sách chủ đề 📚✨
+    <h1 class="text-3xl font-semibold mb-6 text-blue-700">
+      Danh sách chủ đề 
       
     </h1>
 
