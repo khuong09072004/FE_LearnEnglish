@@ -14,7 +14,7 @@
         </nav>
 
         <button @click="goLogin" class="bg-indigo-600 text-white px-5 py-2 rounded-xl shadow hover:bg-indigo-700 transition">
-          Đăng nhập
+          Trải nghiệm
         </button>
       </div>
     </header>
