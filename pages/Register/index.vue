@@ -1,10 +1,11 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-blue-100">
-    <div class="relative bg-white rounded-2xl shadow-2xl w-2/5 border border-blue-200">
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl lg:w-2/5 border border-blue-200 mx-4 sm:mx-6 md:mx-12 lg:mx-auto my-8">
       <!-- Nút Quay lại -->
       <button
         @click="goBack"
-        class="absolute ml-4 mt-6 flex items-center space-x-0 text-blue-600 hover:text-blue-800 transition border-none"
+        class="absolute left-6 top-6 flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition bg-white px-3 py-3  border-none text-sm sm:text-base"
+        aria-label="Quay lại"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +24,7 @@
         <span class="font-medium">Quay lại</span>
       </button>
 
-      <div class="p-10">
+      <div class="p-6 sm:p-10">
         <h2 class="text-3xl font-bold text-center text-blue-700 mb-8">
           Tạo tài khoản mới
         </h2>
@@ -36,7 +37,7 @@
               type="text"
               placeholder="Nhập họ và tên của bạn"
               required
-              class="w-full p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              class="w-full p-3 sm:p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
             />
           </div>
 
@@ -76,7 +77,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold text-lg transition disabled:opacity-60"
+            class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold text-base sm:text-lg transition disabled:opacity-60"
           >
             {{ loading ? 'Đang đăng ký...' : 'Đăng ký' }}
           </button>
