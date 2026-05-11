@@ -16,8 +16,8 @@
           <div class="header-content">
             <div class="robot-avatar">🤖</div>
             <div>
-              <h3>Trợ lý AI</h3>
-              <span class="status">Online</span>
+              <h3>Trợ lý AI LearnEnglish</h3>
+             
             </div>
           </div>
           <button class="close-btn" @click="toggleChat" type="button">✕</button>
@@ -126,27 +126,23 @@ export default {
       this.isTyping = true
 
       try {
-        const res = await fetch(
-          'https://khuongba.app.n8n.cloud/webhook/chatbot-english',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              message: userText,
-              sessionId: this.sessionId
-            })
-          }
-        )
+        // Call server-side proxy which holds the OpenAI API key
+        const res = await fetch('/api/openai/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: userText, sessionId: this.sessionId })
+        })
 
         const data = await res.json()
         console.log('AI RESPONSE:', data)
 
-        this.messages.push({
-          role: 'bot',
-          text: data.reply
-        })
+        if (data && data.reply) {
+          this.messages.push({ role: 'bot', text: data.reply })
+        } else {
+          this.messages.push({ role: 'bot', text: '❌ AI không trả lời.' })
+        }
       } catch (err) {
         this.messages.push({
           role: 'bot',

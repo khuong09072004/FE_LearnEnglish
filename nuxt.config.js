@@ -33,6 +33,11 @@ export default {
     "@nuxtjs/dotenv",
   ],
 
+  // Server middleware for secure server-side proxy to OpenAI
+  serverMiddleware: [
+    { path: "/api/openai", handler: "~/server-middleware/openai-proxy.js" },
+  ],
+
   axios: {},
 
   build: {
