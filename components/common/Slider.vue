@@ -238,6 +238,9 @@ export default {
   background: #fff;
   border-radius: 12px;
 }
+.logo-area.collapsed .logo-container {
+  padding: 0;
+}
 .logo-area.collapsed {
   justify-content: center;
   padding: 22px 0 16px;
