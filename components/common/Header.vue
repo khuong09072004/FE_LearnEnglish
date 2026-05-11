@@ -39,7 +39,7 @@
         
 
         <!-- Avatar -->
-        <a-popover trigger="click" placement="bottomRight">
+        <a-popover :visible="popoverVisible" @visibleChange="handlePopoverVisibleChange" trigger="click" placement="bottomRight">
           <template #content>
             <div class="user-popover">
               <!-- Thông tin user -->
@@ -102,6 +102,7 @@ export default {
   data() {
     return {
       currentLang: "vi",
+      popoverVisible: false,
     };
   },
   computed: {
@@ -145,7 +146,12 @@ export default {
     },
   },
   methods: {
+    handlePopoverVisibleChange(visible) {
+      this.popoverVisible = visible;
+    },
     confirmLogout() {
+      this.popoverVisible = false;
+      this.$nextTick(() => {
       this.$confirm({
         title: "Xác nhận đăng xuất",
         content: "Bạn có chắc chắn muốn đăng xuất không?",
@@ -155,17 +161,21 @@ export default {
           this.$store.dispatch("auth/logout");
           this.$message.success("Đã đăng xuất");
           this.$router.push("/login");
+          this.popoverVisible = false;
         },
+      });
       });
     },
     goToProfile() {
       this.$router.push("/profile");
+      this.popoverVisible = false;
     },
     goToEditProfile() {
       this.$router.push("/profile/edit");
     },
     goToTrackProgress() {
       this.$router.push("/progress");
+      this.popoverVisible = false;
     },
   },
   mounted() {

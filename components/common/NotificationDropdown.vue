@@ -260,6 +260,7 @@ export default {
         this.notifications.forEach(n => n.read = true);
         this.unreadCount = 0;
         this.$message.success("Đã đánh dấu tất cả thông báo là đã đọc");
+        this.visible = false;
       } catch (error) {
         console.error("Lỗi khi đánh dấu tất cả đã đọc:", error);
         this.$message.error("Có lỗi xảy ra");
@@ -324,6 +325,7 @@ export default {
         this.totalPages = 0;
         
         this.$message.success("Đã xóa tất cả thông báo");
+        this.visible = false;
       } catch (error) {
         console.error("Lỗi khi xóa tất cả thông báo:", error);
         this.$message.error("Không thể xóa thông báo");
