@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center p-6"
+    class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex  justify-center px-6"
   >
     <!-- Loading -->
     <div v-if="loading" class="text-3xl text-gray-600">Đang tải từ vựng...</div>
@@ -26,12 +26,12 @@
         @click="flipped = !flipped"
       >
         <div
-          class="relative w-full h-96 preserve-3d transition-all duration-700"
+          class="relative w-full h-98 preserve-3d transition-all duration-700"
           :class="{ 'rotate-y-180': flipped }"
         >
           <!-- Mặt trước -->
           <div
-            class="absolute inset-0 flex flex-col items-center justify-center p-12 backface-hidden bg-white rounded-3xl"
+            class="absolute inset-0 flex flex-col items-center justify-center p-16 backface-hidden bg-white rounded-3xl"
           >
             <h1 class="text-4xl font-bold text-gray-800 mb-6">
               {{ currentWord.word }}
@@ -51,28 +51,26 @@
 
           <!-- Mặt sau -->
           <div
-            class="absolute inset-0 flex flex-col items-center justify-center p-12 backface-hidden bg-gradient-to-b from-indigo-50 to-blue-50 rounded-3xl rotate-y-180"
+            class="absolute inset-0 flex flex-col items-center justify-center p-16 backface-hidden bg-gradient-to-b from-indigo-50 to-blue-50 rounded-3xl rotate-y-180"
           >
             <p class="text-3xl font-bold text-indigo-800 mb-6">
               {{ currentWord.meaning }}
             </p>
-            <p class="text-2xl text-gray-700 mb-8 italic">
+            <p class="text-2xl text-gray-700 mb-5 italic">
               {{ currentWord.description || "— Không có mô tả —" }}
             </p>
             <div
               class="bg-gray-200 border-2 border-dashed rounded-xl w-80 h-80 flex items-center justify-center"
             >
-              <div
-                class="w-40 h-40 rounded-xl overflow-hidden shadow-lg bg-gray-100"
-              >
+              <div class="w-40 h-40 rounded-xl overflow-hidden bg-gray-100">
                 <img
                   :src="currentWord?.image_url || '/no-image.jpg'"
                   alt="Ảnh minh họa"
-                  class="object-cover rounded-xl shadow-lg"
+                  class="w-full h-full object-cover"
                 />
               </div>
             </div>
-            <p class="mt-6 text-gray-500 text-sm">👆 Bấm lại để xem mặt trước</p>
+            <p class="mt-4 text-gray-500 text-sm">👆 Bấm lại để xem mặt trước</p>
           </div>
         </div>
       </div>
@@ -239,8 +237,8 @@ export default {
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
-.h-96 {
-  height: 24rem;
+.h-98 {
+  height: 24.5rem;
 }
 fireworks {
   position: fixed;

@@ -23,10 +23,7 @@
         <div>
           <h1 class="text-3xl font-bold flex items-center text-blue-700 gap-3">
             Chat Room
-            <span
-              class="w-3 h-3 rounded-full animate-pulse"
-              :class="isConnected ? 'bg-green-400' : 'bg-gray-500'"
-            ></span>
+            
           </h1>
           <p class="text-gray-600 mt-1">Kết nối và trò chuyện với mọi người</p>
         </div>
