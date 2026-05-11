@@ -312,6 +312,8 @@ export default {
 
   data() {
     return {
+      chatStateKey: "learnenglish_chat_state",
+      pendingRestoreTopicId: null,
       topics: [],
       loadingTopics: true,
 
@@ -324,17 +326,107 @@ export default {
     };
   },
 
-  mounted() {
-    this.loadTopics();
+  watch: {
+    isConnected(connected) {
+      if (connected) {
+        this.tryRestoreChatRoom();
+      }
+    },
+  },
+
+  async mounted() {
+    await this.loadTopics();
+
+    if (this.isPageReload()) {
+      this.restoreChatState();
+    } else {
+      this.clearChatState();
+    }
+
     this.initChatService();
-    this.connectToChat();
+    await this.connectToChat();
+    this.tryRestoreChatRoom();
   },
 
   beforeDestroy() {
+    this.saveChatState();
     this.disconnectChat();
   },
 
   methods: {
+    isPageReload() {
+      if (!process.client) return false;
+
+      const navigationEntries =
+        window.performance &&
+        typeof window.performance.getEntriesByType === "function"
+          ? window.performance.getEntriesByType("navigation")
+          : [];
+
+      if (navigationEntries.length > 0) {
+        return navigationEntries[0].type === "reload";
+      }
+
+      if (window.performance && window.performance.navigation) {
+        return window.performance.navigation.type === 1;
+      }
+
+      return false;
+    },
+
+    saveChatState() {
+      if (!process.client) return;
+
+      if (!this.chatTopicId) {
+        this.clearChatState();
+        return;
+      }
+
+      const state = { chatTopicId: this.chatTopicId };
+      localStorage.setItem(this.chatStateKey, JSON.stringify(state));
+    },
+
+    clearChatState() {
+      if (!process.client) return;
+      localStorage.removeItem(this.chatStateKey);
+    },
+
+    restoreChatState() {
+      if (!process.client) return;
+
+      const rawState = localStorage.getItem(this.chatStateKey);
+      if (!rawState) return;
+
+      try {
+        const state = JSON.parse(rawState);
+        const topicId = state?.chatTopicId;
+        if (typeof topicId !== "number") {
+          this.clearChatState();
+          return;
+        }
+        this.pendingRestoreTopicId = topicId;
+      } catch (error) {
+        this.clearChatState();
+      }
+    },
+
+    async tryRestoreChatRoom() {
+      if (!this.isConnected || !this.pendingRestoreTopicId || this.chatTopicId) {
+        return;
+      }
+
+      const topicExists = this.topics.some((topic) => topic.id === this.pendingRestoreTopicId);
+      if (!topicExists) {
+        this.clearChatState();
+        this.pendingRestoreTopicId = null;
+        return;
+      }
+
+      const topicId = this.pendingRestoreTopicId;
+      this.pendingRestoreTopicId = null;
+      await this.joinChatTopic(topicId);
+    },
+
     async loadTopics() {
       this.loadingTopics = true;
       try {
@@ -411,6 +503,7 @@ export default {
       );
       this.chatTopicId = null;
       this.chatMessages = [];
+      this.clearChatState();
       this.$message.info("Đã rời phòng chat");
     },
 
@@ -421,6 +514,7 @@ export default {
       this.addSystemMessage("🔻 Đang ngắt kết nối...");
       this.disconnectChat();
       this.chatTopicId = null;
+      this.clearChatState();
     },
 
     async joinChatTopic(topicId) {
@@ -437,6 +531,7 @@ export default {
 
       this.chatTopicId = topicId;
       this.chatMessages = [];
+      this.saveChatState();
       this.addSystemMessage(`📡 Tham gia ${this.getTopicName(topicId)}...`);
 
       try {

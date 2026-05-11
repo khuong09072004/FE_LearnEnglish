@@ -28,7 +28,7 @@
                 selectedLesson && selectedLesson.id === lesson.id,
               'border-green-300 bg-green-50': lesson.is_learn,
             }"
-            @click="startLesson(lesson)"
+            @click="confirmStartLesson(lesson)"
           >
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-semibold text-gray-800 flex-1">{{ lesson.title }}</h3>
@@ -88,17 +88,27 @@
             >
               <div class="flex items-start justify-between">
                 <div class="flex-1">
-                  <h2 class="text-lg font-bold">{{ selectedLesson.title }}</h2>
+                  <h2 class="text-lg text-white font-bold">{{ selectedLesson.title }}</h2>
                   <p class="text-blue-100 text-sm">
                     {{ selectedLesson.description }}
                   </p>
                 </div>
-                <div
-                  v-if="selectedLesson.is_learn"
-                  class="inline-flex items-center gap-1.5 text-sm font-medium bg-green-500 bg-opacity-80 px-3 py-1.5 rounded-lg ml-3 whitespace-nowrap"
-                >
-                  <a-icon type="check-circle" theme="filled" />
-                  Đã học
+                <div class="flex items-center gap-2 ml-3">
+                  <div
+                    v-if="selectedLesson.is_learn"
+                    class="inline-flex items-center gap-2 text-sm font-medium bg-green-500 bg-opacity-80 px-3 py-2 rounded-lg whitespace-nowrap"
+                  >
+                    <a-icon type="check-circle" theme="filled" />
+                    Đã học
+                  </div>
+                  <a-button
+                    size="small"
+                    @click="showLeaveConversationConfirm"
+                    class="leave-conversation-btn"
+                  >
+                    <a-icon type="logout" />
+                    Rời
+                  </a-button>
                 </div>
               </div>
             </div>
@@ -213,6 +223,7 @@ export default {
 
   data() {
     return {
+      conversationStateKey: "learnenglish_conversation_state",
       lessons: [],
       loadingLessons: true,
       selectedLesson: null,
@@ -224,11 +235,175 @@ export default {
     };
   },
 
-  mounted() {
-    this.loadLessons();
+  async mounted() {
+    await this.loadLessons();
+
+    if (this.isPageReload()) {
+      this.restoreConversationState();
+    } else {
+      this.clearConversationState();
+    }
+  },
+
+  beforeDestroy() {
+    this.saveConversationState();
   },
 
   methods: {
+    confirmStartLesson(lesson) {
+      if (this.selectedLesson && this.selectedLesson.id === lesson.id) {
+        return;
+      }
+
+      if (this.selectedLesson) {
+        this.startLesson(lesson);
+        return;
+      }
+
+      const isLearned = Boolean(lesson?.is_learn);
+
+      this.$confirm({
+        title: isLearned
+          ? "Bạn đã học đoạn hội thoại này"
+          : "Xác nhận bắt đầu hội thoại",
+        content: isLearned
+          ? "Bạn có thể xem lại lịch sử đã học."
+          : `Bạn muốn luyện viết với AI đoạn hội thoại \"${lesson.title}\" này?`,
+        okText: isLearned ? "Xem lịch sử học" : "Bắt đầu",
+        cancelText: "Hủy",
+        centered: true,
+        onOk: () => {
+          this.startLesson(lesson);
+        },
+      });
+    },
+
+    isPageReload() {
+      if (!process.client) return false;
+
+      const navigationEntries =
+        window.performance &&
+        typeof window.performance.getEntriesByType === "function"
+          ? window.performance.getEntriesByType("navigation")
+          : [];
+
+      if (navigationEntries.length > 0) {
+        return navigationEntries[0].type === "reload";
+      }
+
+      if (window.performance && window.performance.navigation) {
+        return window.performance.navigation.type === 1;
+      }
+
+      return false;
+    },
+
+    isConversationCompletedError(error) {
+      const status = error?.response?.status;
+      const errorData = error?.response?.data;
+      const code = errorData?.code;
+      const conversationStatus = errorData?.status;
+      const message = errorData?.message;
+
+      return (
+        status === 409 &&
+        (code === 409 ||
+          conversationStatus === "conversation_completed" ||
+          message === "Conversation already completed")
+      );
+    },
+
+    resetConversationView() {
+      this.selectedLesson = null;
+      this.messages = [];
+      this.sessionId = null;
+      this.userInput = "";
+      this.starting = false;
+      this.replying = false;
+      this.clearConversationState();
+    },
+
+    saveConversationState() {
+      if (!process.client) return;
+
+      if (!this.selectedLesson) {
+        this.clearConversationState();
+        return;
+      }
+
+      const state = {
+        selectedLessonId: this.selectedLesson.id,
+        sessionId: this.sessionId,
+        messages: this.messages,
+      };
+
+      localStorage.setItem(this.conversationStateKey, JSON.stringify(state));
+    },
+
+    clearConversationState() {
+      if (!process.client) return;
+      localStorage.removeItem(this.conversationStateKey);
+    },
+
+    restoreConversationState() {
+      if (!process.client) return;
+
+      const rawState = localStorage.getItem(this.conversationStateKey);
+      if (!rawState) return;
+
+      try {
+        const state = JSON.parse(rawState);
+        if (!state?.selectedLessonId) return;
+
+        const lesson = this.lessons.find((item) => item.id === state.selectedLessonId);
+        if (!lesson) {
+          this.clearConversationState();
+          return;
+        }
+
+        this.selectedLesson = lesson;
+        this.sessionId = state.sessionId || null;
+        this.messages = Array.isArray(state.messages) ? state.messages : [];
+        this.userInput = "";
+
+        this.scrollToBottom();
+      } catch (error) {
+        this.clearConversationState();
+      }
+    },
+
+    showConversationCompletedDialog() {
+      this.$confirm({
+        title: "Bạn đã học xong đoạn hội thoại này",
+        content: "Bạn có muốn học hội thoại mới không?",
+        okText: "OK",
+        cancelText: "Hủy",
+        centered: true,
+        onOk: async () => {
+          this.resetConversationView();
+          await this.loadLessons();
+        },
+      });
+    },
+
+    showLeaveConversationConfirm() {
+      this.$confirm({
+        title: "Rời đoạn hội thoại?",
+        content: "Bạn có muốn quay lại danh sách bài hội thoại không?",
+        okText: "Rời",
+        okType: "danger",
+        cancelText: "Ở lại",
+        centered: true,
+        onOk: () => {
+          this.leaveConversation();
+        },
+      });
+    },
+
+    leaveConversation() {
+      this.resetConversationView();
+    },
+
     async loadLessons() {
       this.loadingLessons = true;
       try {
@@ -249,6 +424,7 @@ export default {
       this.sessionId = null;
       this.userInput = "";
       this.starting = true;
+      this.saveConversationState();
 
       try {
         if (lesson.is_learn) {
@@ -272,6 +448,7 @@ export default {
               }];
             }
             this.scrollToBottom();
+            this.saveConversationState();
           }
         } else {
           // Nếu chưa học, bắt đầu cuộc hội thoại mới
@@ -283,10 +460,15 @@ export default {
               content: response.data.content,
             });
             this.scrollToBottom();
+            this.saveConversationState();
           }
         }
       } catch (error) {
-        this.$message.error("Không thể tải bài hội thoại");
+        if (this.isConversationCompletedError(error)) {
+          this.showConversationCompletedDialog();
+        } else {
+          this.$message.error("Không thể tải bài hội thoại");
+        }
       } finally {
         this.starting = false;
       }
@@ -301,6 +483,7 @@ export default {
       // Thêm tin nhắn người dùng
       this.messages.push({ role: "USER", content: userMessage });
       this.scrollToBottom();
+      this.saveConversationState();
 
       this.replying = true;
       try {
@@ -315,9 +498,14 @@ export default {
             score: data.score,
           });
           this.scrollToBottom();
+          this.saveConversationState();
         }
       } catch (error) {
-        this.$message.error("Không thể gửi tin nhắn");
+        if (this.isConversationCompletedError(error)) {
+          this.showConversationCompletedDialog();
+        } else {
+          this.$message.error("Không thể gửi tin nhắn");
+        }
       } finally {
         this.replying = false;
       }
@@ -356,6 +544,30 @@ export default {
 .typing-dots span:nth-child(1) { animation-delay: 0s; }
 .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
 .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+.leave-conversation-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.leave-conversation-btn:hover,
+.leave-conversation-btn:focus {
+  border-color: rgba(248, 113, 113, 0.8);
+  background: rgba(239, 68, 68, 0.18);
+  color: #fee2e2;
+}
+
+.leave-conversation-btn .anticon {
+  margin-right: 6px;
+}
 
 @keyframes typing-bounce {
   0%, 60%, 100% { transform: translateY(0); }
